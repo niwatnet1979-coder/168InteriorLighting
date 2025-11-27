@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sale, generateID } from '@/types/schema';
+import { Sale, generateID, Product } from '@/types/schema';
+import { supabase } from '@/lib/supabase';
 import { X } from 'lucide-react';
 
 interface SaleModalProps {
@@ -14,6 +15,16 @@ interface SaleModalProps {
 
 export default function SaleModal({ isOpen, onClose, onSave, initialData, isSaving }: SaleModalProps) {
     const [formData, setFormData] = useState<Partial<Sale>>({});
+    const [products, setProducts] = useState<Product[]>([]);
+
+    // Fetch Products for Dropdown
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const { data } = await supabase.from('PID').select('PID, PDName, PDPrice');
+            if (data) setProducts(data as Product[]);
+        };
+        if (isOpen) fetchProducts();
+    }, [isOpen]);
 
     // Reset form when modal opens
     useEffect(() => {
@@ -52,6 +63,16 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const pid = e.target.value;
+        const product = products.find(p => p.PID === pid);
+        setFormData(prev => ({
+            ...prev,
+            PID: pid,
+            Price: product ? product.PDPrice : 0 // Auto-fill Price
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -95,8 +116,20 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                     <div className="space-y-4">
                         <h3 className="font-semibold text-gray-700 border-b pb-2">สินค้าและราคา</h3>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">รหัสสินค้า (PID)</label>
-                            <input type="text" name="PID" value={formData.PID || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" />
+                            <label className="block text-sm font-medium text-gray-700">เลือกสินค้า (PID)</label>
+                            <select
+                                name="PID"
+                                value={formData.PID || ''}
+                                onChange={handleProductChange}
+                                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 bg-white"
+                            >
+                                <option value="">-- กรุณาเลือกสินค้า --</option>
+                                {products.map((p) => (
+                                    <option key={p.PID} value={p.PID}>
+                                        {p.PID} - {p.PDName} ({p.PDPrice?.toLocaleString()} ฿)
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
