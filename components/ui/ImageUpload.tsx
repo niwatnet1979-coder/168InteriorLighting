@@ -98,14 +98,11 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
             {previewUrl ? (
                 <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-300 flex items-center justify-center">
                     {isPdf ? (
-                        <div className="text-center p-4">
-                            <div className="mx-auto w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-2">
-                                <span className="text-xs font-bold">PDF</span>
-                            </div>
-                            <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline break-all">
-                                ดูไฟล์ PDF
-                            </a>
-                        </div>
+                        <iframe
+                            src={`${previewUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                            className="w-full h-full"
+                            title="PDF Preview"
+                        />
                     ) : (
                         <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
                     )}
