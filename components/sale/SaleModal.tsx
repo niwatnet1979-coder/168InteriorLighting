@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sale, generateID, Product } from '@/types/schema';
 import { supabase } from '@/lib/supabase';
-import { X } from 'lucide-react';
+import { X, Search, ChevronDown } from 'lucide-react';
 
 interface SaleModalProps {
     isOpen: boolean;
@@ -17,7 +17,12 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
     const [formData, setFormData] = useState<Partial<Sale>>({});
     const [products, setProducts] = useState<Product[]>([]);
 
-    // Fetch Products for Dropdown
+    // Searchable Dropdown States
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Fetch Products
     useEffect(() => {
         const fetchProducts = async () => {
             const { data } = await supabase.from('PID').select('PID, PDName, PDPrice');
@@ -26,17 +31,18 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
         if (isOpen) fetchProducts();
     }, [isOpen]);
 
-    // Reset form when modal opens
+    // Reset form & Search Query when modal opens
     useEffect(() => {
         if (isOpen) {
             if (initialData) {
                 setFormData(initialData);
+                // Set initial search query if editing
+                setSearchQuery(initialData.PID || '');
             } else {
-                // New Sale: Generate ID automatically
                 setFormData({
                     SID: generateID.sale(),
                     Timestamp: new Date().toISOString(),
-                    RecBy: 'Admin', // Should come from auth
+                    RecBy: 'Admin',
                     Price: 0,
                     Qty: 1,
                     Discount: 0,
@@ -44,9 +50,21 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                     InstallationPrice: 0,
                     SumPrice: 0
                 });
+                setSearchQuery('');
             }
+            setIsDropdownOpen(false);
         }
     }, [isOpen, initialData]);
+
+    // Sync Search Query with PID if products loaded (for displaying Name)
+    useEffect(() => {
+        if (formData.PID && products.length > 0 && !isDropdownOpen) {
+            const p = products.find(prod => prod.PID === formData.PID);
+            if (p) {
+                setSearchQuery(`${p.PID} - ${p.PDName}`);
+            }
+        }
+    }, [formData.PID, products, isDropdownOpen]);
 
     // Calculate Total Price
     useEffect(() => {
@@ -60,25 +78,42 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
         setFormData(prev => ({ ...prev, SumPrice: sum }));
     }, [formData.Price, formData.Qty, formData.Discount, formData.ShipPrice, formData.InstallationPrice]);
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const pid = e.target.value;
-        const product = products.find(p => p.PID === pid);
+    const handleSelectProduct = (product: Product) => {
         setFormData(prev => ({
             ...prev,
-            PID: pid,
-            Price: product ? product.PDPrice : 0 // Auto-fill Price
+            PID: product.PID,
+            Price: product.PDPrice
         }));
+        setSearchQuery(`${product.PID} - ${product.PDName}`);
+        setIsDropdownOpen(false);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await onSave(formData as Sale);
     };
+
+    // Filter products based on search query
+    const filteredProducts = products.filter(p =>
+        p.PID.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.PDName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     if (!isOpen) return null;
 
@@ -115,22 +150,53 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                     {/* Product & Price */}
                     <div className="space-y-4">
                         <h3 className="font-semibold text-gray-700 border-b pb-2">สินค้าและราคา</h3>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">เลือกสินค้า (PID)</label>
-                            <select
-                                name="PID"
-                                value={formData.PID || ''}
-                                onChange={handleProductChange}
-                                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 bg-white"
-                            >
-                                <option value="">-- กรุณาเลือกสินค้า --</option>
-                                {products.map((p) => (
-                                    <option key={p.PID} value={p.PID}>
-                                        {p.PID} - {p.PDName} ({p.PDPrice?.toLocaleString()} ฿)
-                                    </option>
-                                ))}
-                            </select>
+
+                        {/* Searchable Dropdown */}
+                        <div className="relative" ref={dropdownRef}>
+                            <label className="block text-sm font-medium text-gray-700">ค้นหาสินค้า (PID / ชื่อ)</label>
+                            <div className="relative mt-1">
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => {
+                                        setSearchQuery(e.target.value);
+                                        setIsDropdownOpen(true);
+                                    }}
+                                    onFocus={() => setIsDropdownOpen(true)}
+                                    placeholder="พิมพ์เพื่อค้นหา..."
+                                    className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                    {isDropdownOpen ? <Search size={18} /> : <ChevronDown size={18} />}
+                                </div>
+                            </div>
+
+                            {/* Dropdown List */}
+                            {isDropdownOpen && (
+                                <div className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                    {filteredProducts.length === 0 ? (
+                                        <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
+                                            ไม่พบสินค้า
+                                        </div>
+                                    ) : (
+                                        filteredProducts.map((product) => (
+                                            <div
+                                                key={product.PID}
+                                                onClick={() => handleSelectProduct(product)}
+                                                className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50 last:border-0"
+                                            >
+                                                <div className="flex justify-between">
+                                                    <span className="font-medium">{product.PID}</span>
+                                                    <span className="text-gray-500">{product.PDPrice?.toLocaleString()} ฿</span>
+                                                </div>
+                                                <div className="text-xs text-gray-500 truncate">{product.PDName}</div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
                         </div>
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ราคาต่อหน่วย</label>
