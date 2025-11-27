@@ -111,8 +111,8 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
 
     // Filter products based on search query
     const filteredProducts = products.filter(p =>
-        p.PID.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.PDName.toLowerCase().includes(searchQuery.toLowerCase())
+        (p.PID || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.PDName || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     if (!isOpen) return null;
