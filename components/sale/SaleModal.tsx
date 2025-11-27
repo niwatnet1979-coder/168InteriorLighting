@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Sale, generateID, Product } from '@/types/schema';
+import { Sale, generateID, Product, Customer, Team } from '@/types/schema';
 import { supabase } from '@/lib/supabase';
 import { X, Search, ChevronDown } from 'lucide-react';
 
@@ -15,29 +15,47 @@ interface SaleModalProps {
 
 export default function SaleModal({ isOpen, onClose, onSave, initialData, isSaving }: SaleModalProps) {
     const [formData, setFormData] = useState<Partial<Sale>>({});
-    const [products, setProducts] = useState<Product[]>([]);
 
-    // Searchable Dropdown States
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    // Data Lists
+    const [products, setProducts] = useState<Product[]>([]);
+    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [teams, setTeams] = useState<Team[]>([]);
+
+    // Search States
+    const [pidQuery, setPidQuery] = useState('');
+    const [cidQuery, setCidQuery] = useState('');
+    const [staffQuery, setStaffQuery] = useState('');
+
+    // Dropdown Open States
+    const [activeDropdown, setActiveDropdown] = useState<'pid' | 'cid' | 'staff' | null>(null);
+
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Fetch Products
+    // Fetch Data (Products, Customers, Teams)
     useEffect(() => {
-        const fetchProducts = async () => {
-            const { data } = await supabase.from('PID').select('PID, PDName, PDPrice');
-            if (data) setProducts(data as Product[]);
+        const fetchData = async () => {
+            const [pidRes, cidRes, teamRes] = await Promise.all([
+                supabase.from('PID').select('PID, PDName, PDPrice'),
+                supabase.from('Customer').select('CID, Contract'), // Contract is Contact Name
+                supabase.from('Team').select('TID, TName, TNickName')
+            ]);
+
+            if (pidRes.data) setProducts(pidRes.data as Product[]);
+            if (cidRes.data) setCustomers(cidRes.data as Customer[]);
+            if (teamRes.data) setTeams(teamRes.data as Team[]);
         };
-        if (isOpen) fetchProducts();
+
+        if (isOpen) fetchData();
     }, [isOpen]);
 
-    // Reset form & Search Query when modal opens
+    // Reset form & Search Queries when modal opens
     useEffect(() => {
         if (isOpen) {
             if (initialData) {
                 setFormData(initialData);
-                // Set initial search query if editing
-                setSearchQuery(initialData.PID || '');
+                setPidQuery(initialData.PID || '');
+                setCidQuery(initialData.CID || '');
+                setStaffQuery(initialData.Staff || '');
             } else {
                 setFormData({
                     SID: generateID.sale(),
@@ -50,21 +68,34 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                     InstallationPrice: 0,
                     SumPrice: 0
                 });
-                setSearchQuery('');
+                setPidQuery('');
+                setCidQuery('');
+                setStaffQuery('');
             }
-            setIsDropdownOpen(false);
+            setActiveDropdown(null);
         }
     }, [isOpen, initialData]);
 
-    // Sync Search Query with PID if products loaded (for displaying Name)
+    // Sync Search Queries with Selected Values (for displaying Names)
     useEffect(() => {
-        if (formData.PID && products.length > 0 && !isDropdownOpen) {
-            const p = products.find(prod => prod.PID === formData.PID);
-            if (p) {
-                setSearchQuery(`${p.PID} - ${p.PDName}`);
+        if (!activeDropdown) {
+            // Sync PID
+            if (formData.PID && products.length > 0) {
+                const p = products.find(x => x.PID === formData.PID);
+                if (p) setPidQuery(`${p.PID} - ${p.PDName}`);
+            }
+            // Sync CID
+            if (formData.CID && customers.length > 0) {
+                const c = customers.find(x => x.CID === formData.CID);
+                if (c) setCidQuery(`${c.CID} - ${c.Contract}`);
+            }
+            // Sync Staff
+            if (formData.Staff && teams.length > 0) {
+                const t = teams.find(x => x.TID === formData.Staff);
+                if (t) setStaffQuery(`${t.TID} - ${t.TName} (${t.TNickName})`);
             }
         }
-    }, [formData.PID, products, isDropdownOpen]);
+    }, [formData.PID, formData.CID, formData.Staff, products, customers, teams, activeDropdown]);
 
     // Calculate Total Price
     useEffect(() => {
@@ -82,7 +113,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsDropdownOpen(false);
+                setActiveDropdown(null);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -94,32 +125,33 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSelectProduct = (product: Product) => {
-        setFormData(prev => ({
-            ...prev,
-            PID: product.PID,
-            Price: product.PDPrice
-        }));
-        setSearchQuery(`${product.PID} - ${product.PDName}`);
-        setIsDropdownOpen(false);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await onSave(formData as Sale);
     };
 
-    // Filter products based on search query
+    // Filter Functions
     const filteredProducts = products.filter(p =>
-        (p.PID || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (p.PDName || '').toLowerCase().includes(searchQuery.toLowerCase())
+        (p.PID || '').toLowerCase().includes(pidQuery.toLowerCase()) ||
+        (p.PDName || '').toLowerCase().includes(pidQuery.toLowerCase())
+    );
+
+    const filteredCustomers = customers.filter(c =>
+        (c.CID || '').toLowerCase().includes(cidQuery.toLowerCase()) ||
+        (c.Contract || '').toLowerCase().includes(cidQuery.toLowerCase())
+    );
+
+    const filteredTeams = teams.filter(t =>
+        (t.TID || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
+        (t.TName || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
+        (t.TNickName || '').toLowerCase().includes(staffQuery.toLowerCase())
     );
 
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" ref={dropdownRef}>
                 <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
                     <h2 className="text-xl font-bold text-gray-800">
                         {initialData ? 'แก้ไขงานขาย' : 'เพิ่มงานขายใหม่'}
@@ -137,13 +169,85 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                             <label className="block text-sm font-medium text-gray-700">Sale ID (Auto)</label>
                             <input type="text" name="SID" value={formData.SID || ''} readOnly className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm p-2" />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">ลูกค้า (CID)</label>
-                            <input type="text" name="CID" value={formData.CID || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" required />
+
+                        {/* CID Dropdown */}
+                        <div className="relative">
+                            <label className="block text-sm font-medium text-gray-700">ลูกค้า (CID / ชื่อ)</label>
+                            <div className="relative mt-1">
+                                <input
+                                    type="text"
+                                    value={cidQuery}
+                                    onChange={(e) => { setCidQuery(e.target.value); setActiveDropdown('cid'); }}
+                                    onFocus={() => setActiveDropdown('cid')}
+                                    placeholder="ค้นหาลูกค้า..."
+                                    className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500"
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                    {activeDropdown === 'cid' ? <Search size={18} /> : <ChevronDown size={18} />}
+                                </div>
+                            </div>
+                            {activeDropdown === 'cid' && (
+                                <div className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                    {filteredCustomers.length === 0 ? (
+                                        <div className="py-2 px-4 text-gray-700">ไม่พบลูกค้า</div>
+                                    ) : (
+                                        filteredCustomers.map((c) => (
+                                            <div
+                                                key={c.CID}
+                                                onClick={() => {
+                                                    setFormData(prev => ({ ...prev, CID: c.CID }));
+                                                    setCidQuery(`${c.CID} - ${c.Contract}`);
+                                                    setActiveDropdown(null);
+                                                }}
+                                                className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
+                                            >
+                                                <div className="font-medium">{c.CID}</div>
+                                                <div className="text-xs text-gray-500">{c.Contract}</div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">พนักงานขาย</label>
-                            <input type="text" name="Staff" value={formData.Staff || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" />
+
+                        {/* Staff Dropdown */}
+                        <div className="relative">
+                            <label className="block text-sm font-medium text-gray-700">พนักงานขาย (TID / ชื่อ)</label>
+                            <div className="relative mt-1">
+                                <input
+                                    type="text"
+                                    value={staffQuery}
+                                    onChange={(e) => { setStaffQuery(e.target.value); setActiveDropdown('staff'); }}
+                                    onFocus={() => setActiveDropdown('staff')}
+                                    placeholder="ค้นหาพนักงาน..."
+                                    className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500"
+                                />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                    {activeDropdown === 'staff' ? <Search size={18} /> : <ChevronDown size={18} />}
+                                </div>
+                            </div>
+                            {activeDropdown === 'staff' && (
+                                <div className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                    {filteredTeams.length === 0 ? (
+                                        <div className="py-2 px-4 text-gray-700">ไม่พบพนักงาน</div>
+                                    ) : (
+                                        filteredTeams.map((t) => (
+                                            <div
+                                                key={t.TID}
+                                                onClick={() => {
+                                                    setFormData(prev => ({ ...prev, Staff: t.TID }));
+                                                    setStaffQuery(`${t.TID} - ${t.TName}`);
+                                                    setActiveDropdown(null);
+                                                }}
+                                                className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
+                                            >
+                                                <div className="font-medium">{t.TID}</div>
+                                                <div className="text-xs text-gray-500">{t.TName} ({t.TNickName})</div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -151,45 +255,42 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                     <div className="space-y-4">
                         <h3 className="font-semibold text-gray-700 border-b pb-2">สินค้าและราคา</h3>
 
-                        {/* Searchable Dropdown */}
-                        <div className="relative" ref={dropdownRef}>
+                        {/* PID Dropdown */}
+                        <div className="relative">
                             <label className="block text-sm font-medium text-gray-700">ค้นหาสินค้า (PID / ชื่อ)</label>
                             <div className="relative mt-1">
                                 <input
                                     type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => {
-                                        setSearchQuery(e.target.value);
-                                        setIsDropdownOpen(true);
-                                    }}
-                                    onFocus={() => setIsDropdownOpen(true)}
-                                    placeholder="พิมพ์เพื่อค้นหา..."
-                                    className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    value={pidQuery}
+                                    onChange={(e) => { setPidQuery(e.target.value); setActiveDropdown('pid'); }}
+                                    onFocus={() => setActiveDropdown('pid')}
+                                    placeholder="ค้นหาสินค้า..."
+                                    className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500"
                                 />
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                    {isDropdownOpen ? <Search size={18} /> : <ChevronDown size={18} />}
+                                    {activeDropdown === 'pid' ? <Search size={18} /> : <ChevronDown size={18} />}
                                 </div>
                             </div>
-
-                            {/* Dropdown List */}
-                            {isDropdownOpen && (
+                            {activeDropdown === 'pid' && (
                                 <div className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
                                     {filteredProducts.length === 0 ? (
-                                        <div className="cursor-default select-none relative py-2 px-4 text-gray-700">
-                                            ไม่พบสินค้า
-                                        </div>
+                                        <div className="py-2 px-4 text-gray-700">ไม่พบสินค้า</div>
                                     ) : (
-                                        filteredProducts.map((product) => (
+                                        filteredProducts.map((p) => (
                                             <div
-                                                key={product.PID}
-                                                onClick={() => handleSelectProduct(product)}
-                                                className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50 last:border-0"
+                                                key={p.PID}
+                                                onClick={() => {
+                                                    setFormData(prev => ({ ...prev, PID: p.PID, Price: p.PDPrice }));
+                                                    setPidQuery(`${p.PID} - ${p.PDName}`);
+                                                    setActiveDropdown(null);
+                                                }}
+                                                className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
                                             >
                                                 <div className="flex justify-between">
-                                                    <span className="font-medium">{product.PID}</span>
-                                                    <span className="text-gray-500">{product.PDPrice?.toLocaleString()} ฿</span>
+                                                    <span className="font-medium">{p.PID}</span>
+                                                    <span className="text-gray-500">{p.PDPrice?.toLocaleString()} ฿</span>
                                                 </div>
-                                                <div className="text-xs text-gray-500 truncate">{product.PDName}</div>
+                                                <div className="text-xs text-gray-500 truncate">{p.PDName}</div>
                                             </div>
                                         ))
                                     )}
