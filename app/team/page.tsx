@@ -48,7 +48,7 @@ export default function TeamPage() {
                 const { data: latestData } = await supabase
                     .from('Team')
                     .select('Timestamp')
-                    .eq('STID', teamData.STID)
+                    .eq('EID', teamData.EID)
                     .single();
 
                 if (latestData && new Date(latestData.Timestamp).getTime() > new Date(currentTeam.Timestamp).getTime() + 1000) {
@@ -62,7 +62,7 @@ export default function TeamPage() {
             const dataToSave = { ...teamData, Timestamp: new Date().toISOString() };
 
             const { error } = currentTeam
-                ? await supabase.from('Team').update(dataToSave).eq('STID', teamData.STID)
+                ? await supabase.from('Team').update(dataToSave).eq('EID', teamData.EID)
                 : await supabase.from('Team').insert([dataToSave]);
 
             if (error) throw error;
@@ -70,28 +70,31 @@ export default function TeamPage() {
             setIsModalOpen(false);
             fetchTeams();
 
-        } catch (error: any) {
-            alert('Error saving team: ' + error.message);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            alert('Error saving team: ' + errorMessage);
         } finally {
             setIsSaving(false);
         }
     };
 
-    const handleDelete = async (stid: string) => {
-        if (!confirm(`คุณต้องการลบทีมงาน ${stid} ใช่หรือไม่?`)) return;
+    const handleDelete = async (eid: string) => {
+        if (!confirm(`คุณต้องการลบทีมงาน ${eid} ใช่หรือไม่?`)) return;
         try {
-            const { error } = await supabase.from('Team').delete().eq('STID', stid);
+            const { error } = await supabase.from('Team').delete().eq('EID', eid);
             if (error) throw error;
             fetchTeams();
-        } catch (error: any) {
-            alert('Error deleting: ' + error.message);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            alert('Error deleting: ' + errorMessage);
         }
     };
 
     const filteredTeams = teams.filter(t =>
-        (t.STID && t.STID.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (t['ชื่อ'] && t['ชื่อ'].toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (t['Team Name'] && t['Team Name'].toLowerCase().includes(searchTerm.toLowerCase()))
+        (t.EID && t.EID.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (t.NickName && t.NickName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (t.FullName && t.FullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (t.TeamName && t.TeamName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (

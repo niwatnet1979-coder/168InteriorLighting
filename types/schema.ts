@@ -115,12 +115,32 @@ export type Team = {
     Timestamp: string;
     RecBy: string;
     DelDate?: string | null;
-    STID: string;
+    EID: string; // Primary Key - Employee ID
+    TeamName?: string;
+    TeamType?: string;
+    UserType?: string;
     Email?: string;
-    "ชื่อ": string;
-    "Team Name"?: string;
-    "Team Type"?: string;
-    "User Type"?: string;
+    NickName?: string;
+    FullName?: string;
+    LastName?: string;
+    CitizenID?: string;
+    Bank?: string;
+    ACNumber?: string;
+    BirthDay?: string;
+    StartDate?: string;
+    Address?: string;
+    Tel1?: string;
+    Tel2?: string;
+    Job?: string;
+    Level?: string;
+    WorkType?: string;
+    PayType?: string;
+    PayRate?: string;
+    IncentiveRate?: string;
+    Pic?: string;
+    CitizenIDPic?: string;
+    HouseRegPic?: string;
+    EndDate?: string;
 };
 
 // Helper to generate IDs

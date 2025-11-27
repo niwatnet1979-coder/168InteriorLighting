@@ -15,10 +15,11 @@ export default function TeamTable({ teams, onEdit, onDelete }: TeamTableProps) {
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                     <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EID</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อเล่น</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ-นามสกุล</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ทีม</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ประเภททีม</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ประเภท</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
                     </tr>
@@ -26,23 +27,24 @@ export default function TeamTable({ teams, onEdit, onDelete }: TeamTableProps) {
                 <tbody className="bg-white divide-y divide-gray-200">
                     {teams.length === 0 ? (
                         <tr>
-                            <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                            <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                                 ไม่พบข้อมูลทีมงาน
                             </td>
                         </tr>
                     ) : (
                         teams.map((team) => (
-                            <tr key={team.STID} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{team.STID}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{team['ชื่อ']}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team['Team Name']}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team['Team Type']}</td>
+                            <tr key={team.EID} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{team.EID}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{team.NickName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.FullName} {team.LastName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.TeamName}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.TeamType}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{team.Email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button onClick={() => onEdit(team)} className="text-indigo-600 hover:text-indigo-900 mr-3">
                                         <Edit size={18} />
                                     </button>
-                                    <button onClick={() => onDelete(team.STID)} className="text-red-600 hover:text-red-900">
+                                    <button onClick={() => onDelete(team.EID)} className="text-red-600 hover:text-red-900">
                                         <Trash2 size={18} />
                                     </button>
                                 </td>

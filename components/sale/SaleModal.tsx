@@ -37,7 +37,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
             const [pidRes, cidRes, teamRes] = await Promise.all([
                 supabase.from('PID').select('PID, PDName, PDPrice'),
                 supabase.from('Customer').select('CID, Contract'),
-                supabase.from('Team').select('STID, ชื่อ, "Team Name"') // Correct columns
+                supabase.from('Team').select('EID, NickName, FullName, TeamName')
             ]);
 
             if (pidRes.error) console.error('Error fetching PID:', pidRes.error);
@@ -95,8 +95,8 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
             }
             // Sync Staff
             if (formData.Staff && teams.length > 0) {
-                const t = teams.find(x => x.STID === formData.Staff);
-                if (t) setStaffQuery(`${t.STID} - ${t['ชื่อ']}`);
+                const t = teams.find(x => x.EID === formData.Staff);
+                if (t) setStaffQuery(`${t.EID} - ${t.NickName}`);
             }
         }
     }, [formData.PID, formData.CID, formData.Staff, products, customers, teams, activeDropdown]);
@@ -146,9 +146,10 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
     );
 
     const filteredTeams = teams.filter(t =>
-        (t.STID || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
-        (t['ชื่อ'] || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
-        (t['Team Name'] || '').toLowerCase().includes(staffQuery.toLowerCase())
+        (t.EID || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
+        (t.NickName || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
+        (t.FullName || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
+        (t.TeamName || '').toLowerCase().includes(staffQuery.toLowerCase())
     );
 
     if (!isOpen) return null;
@@ -216,7 +217,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
 
                         {/* Staff Dropdown */}
                         <div className="relative">
-                            <label className="block text-sm font-medium text-gray-700">พนักงานขาย (STID / ชื่อ)</label>
+                            <label className="block text-sm font-medium text-gray-700">พนักงานขาย (EID / ชื่อเล่น)</label>
                             <div className="relative mt-1">
                                 <input
                                     type="text"
@@ -237,16 +238,16 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                                     ) : (
                                         filteredTeams.map((t) => (
                                             <div
-                                                key={t.STID}
+                                                key={t.EID}
                                                 onClick={() => {
-                                                    setFormData(prev => ({ ...prev, Staff: t.STID }));
-                                                    setStaffQuery(`${t.STID} - ${t['ชื่อ']}`);
+                                                    setFormData(prev => ({ ...prev, Staff: t.EID }));
+                                                    setStaffQuery(`${t.EID} - ${t.NickName}`);
                                                     setActiveDropdown(null);
                                                 }}
                                                 className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
                                             >
-                                                <div className="font-medium">{t.STID}</div>
-                                                <div className="text-xs text-gray-500">{t['ชื่อ']} ({t['Team Name']})</div>
+                                                <div className="font-medium">{t.EID}</div>
+                                                <div className="text-xs text-gray-500">{t.NickName} - {t.TeamName}</div>
                                             </div>
                                         ))
                                     )}
