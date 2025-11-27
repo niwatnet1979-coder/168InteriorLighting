@@ -15,6 +15,7 @@ export default function TeamPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTeam, setCurrentTeam] = useState<Team | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [latestEID, setLatestEID] = useState<string>('');
 
     useEffect(() => {
         fetchTeams();
@@ -34,6 +35,14 @@ export default function TeamPage() {
 
             if (error) throw error;
             setTeams(data || []);
+
+            // Get latest EID for auto-generation
+            if (data && data.length > 0) {
+                const eids = data.map(t => t.EID).filter(Boolean).sort().reverse();
+                if (eids.length > 0) {
+                    setLatestEID(eids[0]);
+                }
+            }
         } catch (error) {
             console.error('Error fetching teams:', error);
         } finally {
@@ -143,6 +152,7 @@ export default function TeamPage() {
                     onSave={handleSave}
                     initialData={currentTeam}
                     isSaving={isSaving}
+                    latestEID={latestEID}
                 />
             </div>
         </div>

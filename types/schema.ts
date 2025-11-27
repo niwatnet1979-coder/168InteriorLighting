@@ -154,5 +154,17 @@ export const generateID = {
         const minutes = now.getMinutes().toString().padStart(2, '0');
         const seconds = now.getSeconds().toString().padStart(2, '0');
         return `S${year}${month}${day}${hours}${minutes}${seconds}`;
+    },
+    team: (latestEID?: string) => {
+        // Extract number from latest EID (e.g., "EID0011" -> 11)
+        let nextNumber = 1;
+        if (latestEID && latestEID.startsWith('EID')) {
+            const currentNumber = parseInt(latestEID.replace('EID', ''), 10);
+            if (!isNaN(currentNumber)) {
+                nextNumber = currentNumber + 1;
+            }
+        }
+        // Format as EID0001, EID0002, etc.
+        return `EID${nextNumber.toString().padStart(4, '0')}`;
     }
 };

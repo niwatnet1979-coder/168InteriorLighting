@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Team } from '@/types/schema';
+import { Team, generateID } from '@/types/schema';
 import { X } from 'lucide-react';
 
 interface TeamModalProps {
@@ -10,9 +10,10 @@ interface TeamModalProps {
     onSave: (team: Team) => Promise<void>;
     initialData?: Team | null;
     isSaving: boolean;
+    latestEID?: string;
 }
 
-export default function TeamModal({ isOpen, onClose, onSave, initialData, isSaving }: TeamModalProps) {
+export default function TeamModal({ isOpen, onClose, onSave, initialData, isSaving, latestEID }: TeamModalProps) {
     const [formData, setFormData] = useState<Partial<Team>>({});
     const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'work' | 'personal'>('general');
 
@@ -22,7 +23,7 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                 setFormData(initialData);
             } else {
                 setFormData({
-                    EID: '',
+                    EID: generateID.team(latestEID),
                     Timestamp: new Date().toISOString(),
                     RecBy: 'Admin',
                     TeamType: 'SALE',
@@ -31,7 +32,7 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
             }
             setActiveTab('general');
         }
-    }, [isOpen, initialData]);
+    }, [isOpen, initialData, latestEID]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -72,8 +73,8 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                             type="button"
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
-                                    ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
-                                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                                ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
+                                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                 }`}
                         >
                             {tab.label}
