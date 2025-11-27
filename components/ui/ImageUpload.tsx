@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Upload, X, Camera, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Camera, Image as ImageIcon, FileText } from 'lucide-react';
 
 interface ImageUploadProps {
     label: string;
@@ -15,14 +15,17 @@ interface ImageUploadProps {
 export default function ImageUpload({ label, bucketName, folderPath, currentImageUrl, onImageUpload }: ImageUploadProps) {
     const [uploading, setUploading] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const streamRef = useRef<MediaStream | null>(null);
 
     useEffect(() => {
         if (currentImageUrl) {
             if (currentImageUrl.startsWith('http')) {
                 setPreviewUrl(currentImageUrl);
             } else {
-                // Resolve public URL from path
                 const { data } = supabase.storage.from(bucketName).getPublicUrl(currentImageUrl);
                 setPreviewUrl(data.publicUrl);
             }
@@ -31,11 +34,61 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
         }
     }, [currentImageUrl, bucketName]);
 
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Cleanup stream on unmount
+    useEffect(() => {
+        return () => {
+            stopCamera();
+        };
+    }, []);
+
+    const startCamera = async () => {
+        try {
+            setIsCameraOpen(true);
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            streamRef.current = stream;
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
+        } catch (err) {
+            console.error("Error accessing camera:", err);
+            alert("ไม่สามารถเข้าถึงกล้องได้ กรุณาตรวจสอบสิทธิ์การเข้าถึง");
+            setIsCameraOpen(false);
+        }
+    };
+
+    const stopCamera = () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
+        setIsCameraOpen(false);
+    };
+
+    const takePhoto = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const context = canvas.getContext('2d');
+
+            if (context) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob(async (blob) => {
+                    if (blob) {
+                        const file = new File([blob], "camera-photo.jpg", { type: "image/jpeg" });
+                        await handleUpload(file);
+                        stopCamera();
+                    }
+                }, 'image/jpeg');
+            }
+        }
+    };
+
+    const handleUpload = async (file: File) => {
         try {
             setUploading(true);
-            const file = event.target.files?.[0];
-            if (!file) return;
 
             // Create preview
             const objectUrl = URL.createObjectURL(file);
@@ -50,28 +103,11 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
                 .from(bucketName)
                 .upload(filePath, file);
 
-            if (uploadError) {
-                throw uploadError;
-            }
+            if (uploadError) throw uploadError;
 
-            // Get Public URL (Note: For private buckets, we might need signed URLs, but for simplicity we use public URL logic first. 
-            // If the bucket is private, we should use createSignedUrl, but that expires. 
-            // For persistent storage in DB, usually we store the path and generate signed URL on fetch, OR make bucket public.
-            // Given the requirement for "Private" data like ID cards, we should store the PATH and generate Signed URL when viewing.
-            // However, to keep it simple for this iteration, we will store the full path and assume the user can access it via the app logic.)
-
-            // For now, let's store the full path which can be used to generate signed URLs later
-            // Or if we made the bucket public (which is easier for MVP), we get public URL.
-            // Since we set RLS policies for "Authenticated" users, we can use the path.
-
-            // Let's return the full path for now, or the public URL if we decide to make it public.
-            // To make it easy to display, let's try to get a public URL (if bucket is public) or just the path.
-
-            // Actually, for private buckets, we should store the path.
-            // But to display it immediately in the app without complex logic, let's try to get a signed URL for the preview (which we already have via objectUrl)
-            // and pass the Storage Path to the parent.
-
-            onImageUpload(filePath);
+            // Get public URL immediately to ensure consistency
+            const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+            onImageUpload(data.publicUrl);
 
         } catch (error) {
             console.error('Error uploading image:', error);
@@ -81,12 +117,17 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
         }
     };
 
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            await handleUpload(file);
+        }
+    };
+
     const handleRemove = () => {
         setPreviewUrl(null);
         onImageUpload('');
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const isPdf = previewUrl?.toLowerCase().endsWith('.pdf') || (previewUrl?.startsWith('blob:') && previewUrl?.includes('application/pdf'));
@@ -95,35 +136,67 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
         <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
 
-            {previewUrl ? (
-                <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-300 flex items-center justify-center">
+            {isCameraOpen ? (
+                <div className="relative w-full bg-black rounded-lg overflow-hidden flex flex-col items-center">
+                    <video ref={videoRef} autoPlay playsInline className="w-full h-64 object-cover" />
+                    <canvas ref={canvasRef} className="hidden" />
+                    <div className="absolute bottom-4 flex gap-4">
+                        <button onClick={takePhoto} type="button" className="bg-white text-black px-4 py-2 rounded-full font-bold shadow-lg hover:bg-gray-200">
+                            ถ่ายรูป
+                        </button>
+                        <button onClick={stopCamera} type="button" className="bg-red-500 text-white px-4 py-2 rounded-full font-bold shadow-lg hover:bg-red-600">
+                            ยกเลิก
+                        </button>
+                    </div>
+                </div>
+            ) : previewUrl ? (
+                <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-300 flex items-center justify-center group">
                     {isPdf ? (
-                        <iframe
-                            src={`${previewUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-                            className="w-full h-full"
-                            title="PDF Preview"
-                        />
+                        <div className="w-full h-full relative">
+                            <object data={previewUrl} type="application/pdf" className="w-full h-full">
+                                <div className="flex flex-col items-center justify-center h-full">
+                                    <FileText size={48} className="text-red-500 mb-2" />
+                                    <p className="text-sm text-gray-500">ไม่สามารถแสดงตัวอย่าง PDF ได้</p>
+                                    <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline mt-2">
+                                        เปิดดูไฟล์ PDF
+                                    </a>
+                                </div>
+                            </object>
+                            {/* Overlay link for mobile where object might not be interactive or render well */}
+                            <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="absolute bottom-2 right-2 bg-white/90 px-2 py-1 text-xs rounded shadow text-blue-600 hover:text-blue-800 z-10">
+                                🔗 เปิด PDF เต็มจอ
+                            </a>
+                        </div>
                     ) : (
                         <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
                     )}
                     <button
                         type="button"
                         onClick={handleRemove}
-                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-sm z-10"
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-sm z-20"
                     >
                         <X size={16} />
                     </button>
                 </div>
             ) : (
-                <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
-                >
-                    <div className="flex gap-2 mb-2 text-gray-400">
-                        <Camera size={24} />
-                        <ImageIcon size={24} />
+                <div className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-row items-center justify-center gap-4 hover:bg-gray-50 transition-colors p-4">
+                    <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex-1 flex flex-col items-center justify-center cursor-pointer h-full"
+                    >
+                        <ImageIcon size={24} className="text-gray-400 mb-1" />
+                        <span className="text-xs text-gray-500 text-center">เลือกรูป/PDF</span>
                     </div>
-                    <span className="text-sm text-gray-500">{uploading ? 'กำลังอัปโหลด...' : 'แตะเพื่อถ่ายรูป หรือ เลือกไฟล์ (รูป/PDF)'}</span>
+
+                    <div className="h-full w-px bg-gray-300"></div>
+
+                    <div
+                        onClick={startCamera}
+                        className="flex-1 flex flex-col items-center justify-center cursor-pointer h-full"
+                    >
+                        <Camera size={24} className="text-gray-400 mb-1" />
+                        <span className="text-xs text-gray-500 text-center">ถ่ายรูป (กล้อง)</span>
+                    </div>
                 </div>
             )}
 
@@ -135,6 +208,7 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
                 className="hidden"
                 disabled={uploading}
             />
+            {uploading && <p className="text-xs text-blue-500 mt-1 text-center">กำลังอัปโหลด...</p>}
         </div>
     );
 }
