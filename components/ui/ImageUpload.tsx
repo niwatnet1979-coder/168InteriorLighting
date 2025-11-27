@@ -89,17 +89,30 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
         }
     };
 
+    const isPdf = previewUrl?.toLowerCase().endsWith('.pdf') || (previewUrl?.startsWith('blob:') && previewUrl?.includes('application/pdf'));
+
     return (
         <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
 
             {previewUrl ? (
-                <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-300">
-                    <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-300 flex items-center justify-center">
+                    {isPdf ? (
+                        <div className="text-center p-4">
+                            <div className="mx-auto w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-2">
+                                <span className="text-xs font-bold">PDF</span>
+                            </div>
+                            <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline break-all">
+                                ดูไฟล์ PDF
+                            </a>
+                        </div>
+                    ) : (
+                        <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                    )}
                     <button
                         type="button"
                         onClick={handleRemove}
-                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-sm"
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-sm z-10"
                     >
                         <X size={16} />
                     </button>
@@ -113,15 +126,14 @@ export default function ImageUpload({ label, bucketName, folderPath, currentImag
                         <Camera size={24} />
                         <ImageIcon size={24} />
                     </div>
-                    <span className="text-sm text-gray-500">{uploading ? 'กำลังอัปโหลด...' : 'แตะเพื่อถ่ายรูป หรือ เลือกไฟล์'}</span>
+                    <span className="text-sm text-gray-500">{uploading ? 'กำลังอัปโหลด...' : 'แตะเพื่อถ่ายรูป หรือ เลือกไฟล์ (รูป/PDF)'}</span>
                 </div>
             )}
 
             <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*"
-                capture="environment" // Opens camera on mobile
+                accept="image/*,application/pdf"
                 onChange={handleFileChange}
                 className="hidden"
                 disabled={uploading}
