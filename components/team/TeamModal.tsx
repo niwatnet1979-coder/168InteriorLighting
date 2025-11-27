@@ -11,9 +11,12 @@ interface TeamModalProps {
     initialData?: Team | null;
     isSaving: boolean;
     latestEID?: string;
+    uniqueTeamNames?: string[];
+    uniqueTeamTypes?: string[];
+    uniqueJobs?: string[];
 }
 
-export default function TeamModal({ isOpen, onClose, onSave, initialData, isSaving, latestEID }: TeamModalProps) {
+export default function TeamModal({ isOpen, onClose, onSave, initialData, isSaving, latestEID, uniqueTeamNames = [], uniqueTeamTypes = [], uniqueJobs = [] }: TeamModalProps) {
     const [formData, setFormData] = useState<Partial<Team>>({});
     const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'work' | 'personal'>('general');
 
@@ -73,8 +76,8 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                             type="button"
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
-                                ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
-                                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                                    ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
+                                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                 }`}
                         >
                             {tab.label}
@@ -102,22 +105,62 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                                 <label className="block text-sm font-medium text-gray-700">นามสกุล</label>
                                 <input type="text" name="LastName" value={formData.LastName || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
                             </div>
+
+                            {/* TeamName with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ชื่อทีม</label>
-                                <input type="text" name="TeamName" value={formData.TeamName || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+                                <input
+                                    type="text"
+                                    name="TeamName"
+                                    value={formData.TeamName || ''}
+                                    onChange={handleChange}
+                                    list="teamNameList"
+                                    placeholder="เลือกหรือพิมพ์ชื่อทีม"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="teamNameList">
+                                    {uniqueTeamNames.map((name, idx) => (
+                                        <option key={idx} value={name} />
+                                    ))}
+                                </datalist>
                             </div>
+
+                            {/* TeamType with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ประเภททีม</label>
-                                <select name="TeamType" value={formData.TeamType || 'SALE'} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" aria-label="ประเภททีม">
-                                    <option value="บริหาร">บริหาร</option>
-                                    <option value="SALE">SALE</option>
-                                    <option value="QC">QC</option>
-                                    <option value="ช่าง">ช่าง</option>
-                                </select>
+                                <input
+                                    type="text"
+                                    name="TeamType"
+                                    value={formData.TeamType || ''}
+                                    onChange={handleChange}
+                                    list="teamTypeList"
+                                    placeholder="เลือกหรือพิมพ์ประเภททีม"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="teamTypeList">
+                                    {uniqueTeamTypes.map((type, idx) => (
+                                        <option key={idx} value={type} />
+                                    ))}
+                                </datalist>
                             </div>
+
+                            {/* Job with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ตำแหน่ง (Job)</label>
-                                <input type="text" name="Job" value={formData.Job || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+                                <input
+                                    type="text"
+                                    name="Job"
+                                    value={formData.Job || ''}
+                                    onChange={handleChange}
+                                    list="jobList"
+                                    placeholder="เลือกหรือพิมพ์ตำแหน่ง"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="jobList">
+                                    {uniqueJobs.map((job, idx) => (
+                                        <option key={idx} value={job} />
+                                    ))}
+                                </datalist>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ระดับ (Level)</label>

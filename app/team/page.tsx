@@ -17,6 +17,11 @@ export default function TeamPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [latestEID, setLatestEID] = useState<string>('');
 
+    // Unique values for dropdowns
+    const [uniqueTeamNames, setUniqueTeamNames] = useState<string[]>([]);
+    const [uniqueTeamTypes, setUniqueTeamTypes] = useState<string[]>([]);
+    const [uniqueJobs, setUniqueJobs] = useState<string[]>([]);
+
     useEffect(() => {
         fetchTeams();
         const channel = subscribeToTable('Team', (payload) => {
@@ -42,6 +47,15 @@ export default function TeamPage() {
                 if (eids.length > 0) {
                     setLatestEID(eids[0]);
                 }
+
+                // Extract unique values for dropdowns
+                const teamNames = [...new Set(data.map(t => t.TeamName).filter(Boolean))];
+                const teamTypes = [...new Set(data.map(t => t.TeamType).filter(Boolean))];
+                const jobs = [...new Set(data.map(t => t.Job).filter(Boolean))];
+
+                setUniqueTeamNames(teamNames as string[]);
+                setUniqueTeamTypes(teamTypes as string[]);
+                setUniqueJobs(jobs as string[]);
             }
         } catch (error) {
             console.error('Error fetching teams:', error);
@@ -153,6 +167,9 @@ export default function TeamPage() {
                     initialData={currentTeam}
                     isSaving={isSaving}
                     latestEID={latestEID}
+                    uniqueTeamNames={uniqueTeamNames}
+                    uniqueTeamTypes={uniqueTeamTypes}
+                    uniqueJobs={uniqueJobs}
                 />
             </div>
         </div>
