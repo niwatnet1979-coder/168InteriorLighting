@@ -37,7 +37,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
             const [pidRes, cidRes, teamRes] = await Promise.all([
                 supabase.from('PID').select('PID, PDName, PDPrice'),
                 supabase.from('Customer').select('CID, Contract'),
-                supabase.from('Team').select('*') // Fetch all columns to be safe
+                supabase.from('Team').select('STID, ชื่อ, "Team Name"') // Correct columns
             ]);
 
             if (pidRes.error) console.error('Error fetching PID:', pidRes.error);
@@ -46,10 +46,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
 
             if (pidRes.data) setProducts(pidRes.data as Product[]);
             if (cidRes.data) setCustomers(cidRes.data as Customer[]);
-            if (teamRes.data) {
-                console.log('Fetched Teams:', teamRes.data); // Debug log
-                setTeams(teamRes.data as Team[]);
-            }
+            if (teamRes.data) setTeams(teamRes.data as Team[]);
         };
 
         if (isOpen) fetchData();
@@ -98,8 +95,8 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
             }
             // Sync Staff
             if (formData.Staff && teams.length > 0) {
-                const t = teams.find(x => x.TID === formData.Staff);
-                if (t) setStaffQuery(`${t.TID} - ${t.TName} (${t.TNickName})`);
+                const t = teams.find(x => x.STID === formData.Staff);
+                if (t) setStaffQuery(`${t.STID} - ${t['ชื่อ']}`);
             }
         }
     }, [formData.PID, formData.CID, formData.Staff, products, customers, teams, activeDropdown]);
@@ -149,9 +146,9 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
     );
 
     const filteredTeams = teams.filter(t =>
-        (t.TID || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
-        (t.TName || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
-        (t.TNickName || '').toLowerCase().includes(staffQuery.toLowerCase())
+        (t.STID || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
+        (t['ชื่อ'] || '').toLowerCase().includes(staffQuery.toLowerCase()) ||
+        (t['Team Name'] || '').toLowerCase().includes(staffQuery.toLowerCase())
     );
 
     if (!isOpen) return null;
@@ -219,7 +216,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
 
                         {/* Staff Dropdown */}
                         <div className="relative">
-                            <label className="block text-sm font-medium text-gray-700">พนักงานขาย (TID / ชื่อ)</label>
+                            <label className="block text-sm font-medium text-gray-700">พนักงานขาย (STID / ชื่อ)</label>
                             <div className="relative mt-1">
                                 <input
                                     type="text"
@@ -240,16 +237,16 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                                     ) : (
                                         filteredTeams.map((t) => (
                                             <div
-                                                key={t.TID}
+                                                key={t.STID}
                                                 onClick={() => {
-                                                    setFormData(prev => ({ ...prev, Staff: t.TID }));
-                                                    setStaffQuery(`${t.TID} - ${t.TName}`);
+                                                    setFormData(prev => ({ ...prev, Staff: t.STID }));
+                                                    setStaffQuery(`${t.STID} - ${t['ชื่อ']}`);
                                                     setActiveDropdown(null);
                                                 }}
                                                 className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
                                             >
-                                                <div className="font-medium">{t.TID}</div>
-                                                <div className="text-xs text-gray-500">{t.TName} ({t.TNickName})</div>
+                                                <div className="font-medium">{t.STID}</div>
+                                                <div className="text-xs text-gray-500">{t['ชื่อ']} ({t['Team Name']})</div>
                                             </div>
                                         ))
                                     )}

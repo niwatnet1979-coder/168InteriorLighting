@@ -21,17 +21,17 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                 setFormData(initialData);
             } else {
                 setFormData({
-                    TID: '',
+                    STID: '',
                     Timestamp: new Date().toISOString(),
                     RecBy: 'Admin',
-                    TStatus: 'Active',
-                    TStartWork: new Date().toISOString().split('T')[0]
+                    "Team Type": 'Sale', // Default value
+                    "User Type": 'User'
                 });
             }
         }
     }, [isOpen, initialData]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
@@ -57,43 +57,36 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
 
                 <form onSubmit={handleSubmit} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">รหัสพนักงาน (TID)</label>
-                        <input type="text" name="TID" value={formData.TID || ''} onChange={handleChange} readOnly={!!initialData} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 ${initialData ? 'bg-gray-100' : ''}`} required />
+                        <label className="block text-sm font-medium text-gray-700">รหัสพนักงาน (STID)</label>
+                        <input type="text" name="STID" value={formData.STID || ''} onChange={handleChange} readOnly={!!initialData} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 ${initialData ? 'bg-gray-100' : ''}`} required />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">ชื่อ-นามสกุล</label>
-                        <input type="text" name="TName" value={formData.TName || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required />
+                        <input type="text" name="ชื่อ" value={formData['ชื่อ'] || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">ชื่อเล่น</label>
-                        <input type="text" name="TNickName" value={formData.TNickName || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
+                        <label className="block text-sm font-medium text-gray-700">ชื่อทีม (Team Name)</label>
+                        <input type="text" name="Team Name" value={formData['Team Name'] || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">ตำแหน่ง</label>
-                        <input type="text" name="TPosition" value={formData.TPosition || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">เบอร์โทรศัพท์</label>
-                        <input type="text" name="TTel" value={formData.TTel || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Line ID</label>
-                        <input type="text" name="TLine" value={formData.TLine || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">วันที่เริ่มงาน</label>
-                        <input type="date" name="TStartWork" value={formData.TStartWork || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">สถานะ</label>
-                        <select name="TStatus" value={formData.TStatus || 'Active'} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
+                        <label className="block text-sm font-medium text-gray-700">ประเภททีม (Team Type)</label>
+                        <select name="Team Type" value={formData['Team Type'] || 'Sale'} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                            <option value="Sale">Sale</option>
+                            <option value="QC">QC</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
-                    <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">หมายเหตุ</label>
-                        <textarea name="TRemark" value={formData.TRemark || ''} onChange={handleChange} rows={3} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="Email" value={formData.Email || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">User Type</label>
+                        <select name="User Type" value={formData['User Type'] || 'User'} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                        </select>
                     </div>
 
                     <div className="md:col-span-2 flex justify-end gap-3 mt-6 pt-4 border-t">

@@ -48,7 +48,7 @@ export default function TeamPage() {
                 const { data: latestData } = await supabase
                     .from('Team')
                     .select('Timestamp')
-                    .eq('TID', teamData.TID)
+                    .eq('STID', teamData.STID)
                     .single();
 
                 if (latestData && new Date(latestData.Timestamp).getTime() > new Date(currentTeam.Timestamp).getTime() + 1000) {
@@ -62,7 +62,7 @@ export default function TeamPage() {
             const dataToSave = { ...teamData, Timestamp: new Date().toISOString() };
 
             const { error } = currentTeam
-                ? await supabase.from('Team').update(dataToSave).eq('TID', teamData.TID)
+                ? await supabase.from('Team').update(dataToSave).eq('STID', teamData.STID)
                 : await supabase.from('Team').insert([dataToSave]);
 
             if (error) throw error;
@@ -77,10 +77,10 @@ export default function TeamPage() {
         }
     };
 
-    const handleDelete = async (tid: string) => {
-        if (!confirm(`คุณต้องการลบทีมงาน ${tid} ใช่หรือไม่?`)) return;
+    const handleDelete = async (stid: string) => {
+        if (!confirm(`คุณต้องการลบทีมงาน ${stid} ใช่หรือไม่?`)) return;
         try {
-            const { error } = await supabase.from('Team').delete().eq('TID', tid);
+            const { error } = await supabase.from('Team').delete().eq('STID', stid);
             if (error) throw error;
             fetchTeams();
         } catch (error: any) {
@@ -89,9 +89,9 @@ export default function TeamPage() {
     };
 
     const filteredTeams = teams.filter(t =>
-        (t.TID && t.TID.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (t.TName && t.TName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (t.TNickName && t.TNickName.toLowerCase().includes(searchTerm.toLowerCase()))
+        (t.STID && t.STID.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (t['ชื่อ'] && t['ชื่อ'].toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (t['Team Name'] && t['Team Name'].toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
@@ -117,7 +117,7 @@ export default function TeamPage() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                     <input
                         type="text"
-                        placeholder="ค้นหาตาม TID, ชื่อ, ชื่อเล่น..."
+                        placeholder="ค้นหาตาม STID, ชื่อ, ทีม..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"

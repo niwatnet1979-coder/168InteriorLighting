@@ -112,18 +112,15 @@ export type Customer = {
 };
 
 export type Team = {
-    TID: string; // Primary Key
     Timestamp: string;
     RecBy: string;
-    DelDate: string | null;
-    TName: string;
-    TNickName: string;
-    TPosition: string;
-    TTel: string;
-    TLine: string;
-    TRemark: string;
-    TStartWork: string;
-    TStatus: string;
+    DelDate?: string | null;
+    STID: string;
+    Email?: string;
+    "ชื่อ": string;
+    "Team Name"?: string;
+    "Team Type"?: string;
+    "User Type"?: string;
 };
 
 // Helper to generate IDs
