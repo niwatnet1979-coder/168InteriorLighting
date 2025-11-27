@@ -41,7 +41,7 @@ export default function TeamPage() {
             const { data, error } = await supabase
                 .from('Team')
                 .select('*')
-                .order('Timestamp', { ascending: false });
+                .order('EID', { ascending: true });
 
             if (error) throw error;
             setTeams(data || []);
