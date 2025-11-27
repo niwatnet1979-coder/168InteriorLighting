@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Team, generateID } from '@/types/schema';
 import { X } from 'lucide-react';
+import ImageUpload from '@/components/ui/ImageUpload';
 
 interface TeamModalProps {
     isOpen: boolean;
@@ -340,17 +341,30 @@ export default function TeamModal({
                                 <label className="block text-sm font-medium text-gray-700">เลขบัญชี (ACNumber)</label>
                                 <input type="text" name="ACNumber" value={formData.ACNumber || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700">รูปถ่าย (Pic URL)</label>
-                                <input type="text" name="Pic" value={formData.Pic || ''} onChange={handleChange} placeholder="URL ของรูปถ่าย" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700">รูปบัตรประชาชน (CitizenIDPic URL)</label>
-                                <input type="text" name="CitizenIDPic" value={formData.CitizenIDPic || ''} onChange={handleChange} placeholder="URL ของรูปบัตรประชาชน" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
-                            </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700">รูปทะเบียนบ้าน (HouseRegPic URL)</label>
-                                <input type="text" name="HouseRegPic" value={formData.HouseRegPic || ''} onChange={handleChange} placeholder="URL ของรูปทะเบียนบ้าน" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+
+                            {/* Image Uploads */}
+                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                                <ImageUpload
+                                    label="รูปถ่ายหน้าตรง (Pic)"
+                                    bucketName="team-documents"
+                                    folderPath="profile-pics"
+                                    currentImageUrl={formData.Pic}
+                                    onImageUpload={(url) => setFormData(prev => ({ ...prev, Pic: url }))}
+                                />
+                                <ImageUpload
+                                    label="รูปบัตรประชาชน (CitizenIDPic)"
+                                    bucketName="team-documents"
+                                    folderPath="citizen-ids"
+                                    currentImageUrl={formData.CitizenIDPic}
+                                    onImageUpload={(url) => setFormData(prev => ({ ...prev, CitizenIDPic: url }))}
+                                />
+                                <ImageUpload
+                                    label="รูปทะเบียนบ้าน (HouseRegPic)"
+                                    bucketName="team-documents"
+                                    folderPath="house-regs"
+                                    currentImageUrl={formData.HouseRegPic}
+                                    onImageUpload={(url) => setFormData(prev => ({ ...prev, HouseRegPic: url }))}
+                                />
                             </div>
                         </div>
                     )}
