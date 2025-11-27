@@ -14,9 +14,19 @@ interface TeamModalProps {
     uniqueTeamNames?: string[];
     uniqueTeamTypes?: string[];
     uniqueJobs?: string[];
+    uniqueLevels?: string[];
+    uniqueWorkTypes?: string[];
+    uniquePayTypes?: string[];
+    uniquePayRates?: string[];
+    uniqueIncentiveRates?: string[];
 }
 
-export default function TeamModal({ isOpen, onClose, onSave, initialData, isSaving, latestEID, uniqueTeamNames = [], uniqueTeamTypes = [], uniqueJobs = [] }: TeamModalProps) {
+export default function TeamModal({
+    isOpen, onClose, onSave, initialData, isSaving, latestEID,
+    uniqueTeamNames = [], uniqueTeamTypes = [], uniqueJobs = [],
+    uniqueLevels = [], uniqueWorkTypes = [], uniquePayTypes = [],
+    uniquePayRates = [], uniqueIncentiveRates = []
+}: TeamModalProps) {
     const [formData, setFormData] = useState<Partial<Team>>({});
     const [activeTab, setActiveTab] = useState<'general' | 'contact' | 'work' | 'personal'>('general');
 
@@ -29,7 +39,7 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                     EID: generateID.team(latestEID),
                     Timestamp: new Date().toISOString(),
                     RecBy: 'Admin',
-                    TeamType: 'SALE',
+                    TeamType: '',
                     UserType: 'user'
                 });
             }
@@ -76,8 +86,8 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                             type="button"
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
-                                    ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
-                                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                                ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
+                                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                                 }`}
                         >
                             {tab.label}
@@ -162,15 +172,24 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                                     ))}
                                 </datalist>
                             </div>
+
+                            {/* Level with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ระดับ (Level)</label>
-                                <select name="Level" value={formData.Level || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" aria-label="ระดับ">
-                                    <option value="">-- เลือก --</option>
-                                    <option value="CEO">CEO</option>
-                                    <option value="CTO">CTO</option>
-                                    <option value="Junior">Junior</option>
-                                    <option value="Senior">Senior</option>
-                                </select>
+                                <input
+                                    type="text"
+                                    name="Level"
+                                    value={formData.Level || ''}
+                                    onChange={handleChange}
+                                    list="levelList"
+                                    placeholder="เลือกหรือพิมพ์ระดับ"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="levelList">
+                                    {uniqueLevels.map((level, idx) => (
+                                        <option key={idx} value={level} />
+                                    ))}
+                                </datalist>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">User Type</label>
@@ -215,31 +234,81 @@ export default function TeamModal({ isOpen, onClose, onSave, initialData, isSavi
                                 <label className="block text-sm font-medium text-gray-700">วันสิ้นสุด (EndDate)</label>
                                 <input type="text" name="EndDate" value={formData.EndDate || ''} onChange={handleChange} placeholder="DD/MM/YYYY" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
                             </div>
+
+                            {/* WorkType with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ประเภทการทำงาน (WorkType)</label>
-                                <select name="WorkType" value={formData.WorkType || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" aria-label="ประเภทการทำงาน">
-                                    <option value="">-- เลือก --</option>
-                                    <option value="ประจำ">ประจำ</option>
-                                    <option value="ทดลองงาน 3 เดือน">ทดลองงาน 3 เดือน</option>
-                                    <option value="พาร์ทไทม์">พาร์ทไทม์</option>
-                                </select>
+                                <input
+                                    type="text"
+                                    name="WorkType"
+                                    value={formData.WorkType || ''}
+                                    onChange={handleChange}
+                                    list="workTypeList"
+                                    placeholder="เลือกหรือพิมพ์ประเภทการทำงาน"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="workTypeList">
+                                    {uniqueWorkTypes.map((type, idx) => (
+                                        <option key={idx} value={type} />
+                                    ))}
+                                </datalist>
                             </div>
+
+                            {/* PayType with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ประเภทการจ่าย (PayType)</label>
-                                <select name="PayType" value={formData.PayType || ''} onChange={handleChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" aria-label="ประเภทการจ่าย">
-                                    <option value="">-- เลือก --</option>
-                                    <option value="monthly">รายเดือน (Monthly)</option>
-                                    <option value="Daily">รายวัน (Daily)</option>
-                                    <option value="Hourly">รายชั่วโมง (Hourly)</option>
-                                </select>
+                                <input
+                                    type="text"
+                                    name="PayType"
+                                    value={formData.PayType || ''}
+                                    onChange={handleChange}
+                                    list="payTypeList"
+                                    placeholder="เลือกหรือพิมพ์ประเภทการจ่าย"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="payTypeList">
+                                    {uniquePayTypes.map((type, idx) => (
+                                        <option key={idx} value={type} />
+                                    ))}
+                                </datalist>
                             </div>
+
+                            {/* PayRate with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">อัตราค่าจ้าง (PayRate)</label>
-                                <input type="text" name="PayRate" value={formData.PayRate || ''} onChange={handleChange} placeholder="เช่น 30000" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+                                <input
+                                    type="text"
+                                    name="PayRate"
+                                    value={formData.PayRate || ''}
+                                    onChange={handleChange}
+                                    list="payRateList"
+                                    placeholder="เลือกหรือพิมพ์อัตราค่าจ้าง"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="payRateList">
+                                    {uniquePayRates.map((rate, idx) => (
+                                        <option key={idx} value={rate} />
+                                    ))}
+                                </datalist>
                             </div>
+
+                            {/* IncentiveRate with datalist */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">อัตราค่าคอมมิชชั่น (IncentiveRate)</label>
-                                <input type="text" name="IncentiveRate" value={formData.IncentiveRate || ''} onChange={handleChange} placeholder="เช่น 1000" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" />
+                                <input
+                                    type="text"
+                                    name="IncentiveRate"
+                                    value={formData.IncentiveRate || ''}
+                                    onChange={handleChange}
+                                    list="incentiveRateList"
+                                    placeholder="เลือกหรือพิมพ์อัตราค่าคอมมิชชั่น"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"
+                                />
+                                <datalist id="incentiveRateList">
+                                    {uniqueIncentiveRates.map((rate, idx) => (
+                                        <option key={idx} value={rate} />
+                                    ))}
+                                </datalist>
                             </div>
                         </div>
                     )}

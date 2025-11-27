@@ -21,6 +21,11 @@ export default function TeamPage() {
     const [uniqueTeamNames, setUniqueTeamNames] = useState<string[]>([]);
     const [uniqueTeamTypes, setUniqueTeamTypes] = useState<string[]>([]);
     const [uniqueJobs, setUniqueJobs] = useState<string[]>([]);
+    const [uniqueLevels, setUniqueLevels] = useState<string[]>([]);
+    const [uniqueWorkTypes, setUniqueWorkTypes] = useState<string[]>([]);
+    const [uniquePayTypes, setUniquePayTypes] = useState<string[]>([]);
+    const [uniquePayRates, setUniquePayRates] = useState<string[]>([]);
+    const [uniqueIncentiveRates, setUniqueIncentiveRates] = useState<string[]>([]);
 
     useEffect(() => {
         fetchTeams();
@@ -52,10 +57,20 @@ export default function TeamPage() {
                 const teamNames = [...new Set(data.map(t => t.TeamName).filter(Boolean))];
                 const teamTypes = [...new Set(data.map(t => t.TeamType).filter(Boolean))];
                 const jobs = [...new Set(data.map(t => t.Job).filter(Boolean))];
+                const levels = [...new Set(data.map(t => t.Level).filter(Boolean))];
+                const workTypes = [...new Set(data.map(t => t.WorkType).filter(Boolean))];
+                const payTypes = [...new Set(data.map(t => t.PayType).filter(Boolean))];
+                const payRates = [...new Set(data.map(t => t.PayRate).filter(Boolean))];
+                const incentiveRates = [...new Set(data.map(t => t.IncentiveRate).filter(Boolean))];
 
                 setUniqueTeamNames(teamNames as string[]);
                 setUniqueTeamTypes(teamTypes as string[]);
                 setUniqueJobs(jobs as string[]);
+                setUniqueLevels(levels as string[]);
+                setUniqueWorkTypes(workTypes as string[]);
+                setUniquePayTypes(payTypes as string[]);
+                setUniquePayRates(payRates as string[]);
+                setUniqueIncentiveRates(incentiveRates as string[]);
             }
         } catch (error) {
             console.error('Error fetching teams:', error);
@@ -170,6 +185,11 @@ export default function TeamPage() {
                     uniqueTeamNames={uniqueTeamNames}
                     uniqueTeamTypes={uniqueTeamTypes}
                     uniqueJobs={uniqueJobs}
+                    uniqueLevels={uniqueLevels}
+                    uniqueWorkTypes={uniqueWorkTypes}
+                    uniquePayTypes={uniquePayTypes}
+                    uniquePayRates={uniquePayRates}
+                    uniqueIncentiveRates={uniqueIncentiveRates}
                 />
             </div>
         </div>
