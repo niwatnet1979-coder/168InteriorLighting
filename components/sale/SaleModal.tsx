@@ -36,13 +36,20 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
         const fetchData = async () => {
             const [pidRes, cidRes, teamRes] = await Promise.all([
                 supabase.from('PID').select('PID, PDName, PDPrice'),
-                supabase.from('Customer').select('CID, Contract'), // Contract is Contact Name
-                supabase.from('Team').select('TID, TName, TNickName')
+                supabase.from('Customer').select('CID, Contract'),
+                supabase.from('Team').select('*') // Fetch all columns to be safe
             ]);
+
+            if (pidRes.error) console.error('Error fetching PID:', pidRes.error);
+            if (cidRes.error) console.error('Error fetching Customer:', cidRes.error);
+            if (teamRes.error) console.error('Error fetching Team:', teamRes.error);
 
             if (pidRes.data) setProducts(pidRes.data as Product[]);
             if (cidRes.data) setCustomers(cidRes.data as Customer[]);
-            if (teamRes.data) setTeams(teamRes.data as Team[]);
+            if (teamRes.data) {
+                console.log('Fetched Teams:', teamRes.data); // Debug log
+                setTeams(teamRes.data as Team[]);
+            }
         };
 
         if (isOpen) fetchData();
