@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Upload, X, Camera, Image as ImageIcon } from 'lucide-react';
 
@@ -14,8 +14,22 @@ interface ImageUploadProps {
 
 export default function ImageUpload({ label, bucketName, folderPath, currentImageUrl, onImageUpload }: ImageUploadProps) {
     const [uploading, setUploading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (currentImageUrl) {
+            if (currentImageUrl.startsWith('http')) {
+                setPreviewUrl(currentImageUrl);
+            } else {
+                // Resolve public URL from path
+                const { data } = supabase.storage.from(bucketName).getPublicUrl(currentImageUrl);
+                setPreviewUrl(data.publicUrl);
+            }
+        } else {
+            setPreviewUrl(null);
+        }
+    }, [currentImageUrl, bucketName]);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
