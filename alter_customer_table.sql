@@ -1,0 +1,7 @@
+-- Add new columns to Customer table
+ALTER TABLE "Customer"
+ADD COLUMN IF NOT EXISTS "LineID" TEXT,
+    ADD COLUMN IF NOT EXISTS "Facebook" TEXT,
+    ADD COLUMN IF NOT EXISTS "Instagram" TEXT,
+    ADD COLUMN IF NOT EXISTS "Other" TEXT,
+    ADD COLUMN IF NOT EXISTS "ComeFrom" TEXT;

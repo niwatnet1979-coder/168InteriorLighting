@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Users, ShoppingCart, ClipboardCheck, Package, BarChart3 } from 'lucide-react';
+import { Users, ShoppingCart, ClipboardCheck, Package, BarChart3, FileText, Truck, Building2 } from 'lucide-react';
 
 export default function Home() {
   const menus = [
@@ -8,6 +8,10 @@ export default function Home() {
     { name: 'จัดการสินค้า (Product)', icon: Package, href: '/product', color: 'bg-purple-500' },
     { name: 'จัดการลูกค้า (Customer)', icon: Users, href: '/customer', color: 'bg-orange-500' },
     { name: 'จัดการทีม (Team)', icon: BarChart3, href: '/team', color: 'bg-indigo-500' },
+    { name: 'งานติดตั้ง (Installation)', icon: ClipboardCheck, href: '/installation', color: 'bg-red-500' },
+    { name: 'จัดการบิล (Bill)', icon: FileText, href: '/bill', color: 'bg-teal-500' },
+    { name: 'ที่อยู่จัดส่ง (Shipping)', icon: Truck, href: '/cship', color: 'bg-pink-500' },
+    { name: 'ข้อมูลภาษี (Tax Info)', icon: Building2, href: '/ctax', color: 'bg-yellow-500' },
   ];
 
   return (

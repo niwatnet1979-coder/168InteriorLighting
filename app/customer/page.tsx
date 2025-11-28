@@ -90,7 +90,7 @@ export default function CustomerPage() {
 
     const filteredCustomers = customers.filter(c =>
         (c.CID && c.CID.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (c.Contract && c.Contract.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (c.ContractName && c.ContractName.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (c.ContractCompany && c.ContractCompany.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 

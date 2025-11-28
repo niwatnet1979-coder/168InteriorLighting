@@ -10,6 +10,15 @@ interface CustomerTableProps {
 }
 
 export default function CustomerTable({ customers, onEdit, onDelete }: CustomerTableProps) {
+    const handleRowClick = (customer: Customer, e: React.MouseEvent) => {
+        // Don't trigger row click if clicking on action buttons
+        const target = e.target as HTMLElement;
+        if (target.closest('button')) {
+            return;
+        }
+        onEdit(customer);
+    };
+
     return (
         <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">
@@ -32,17 +41,33 @@ export default function CustomerTable({ customers, onEdit, onDelete }: CustomerT
                         </tr>
                     ) : (
                         customers.map((customer) => (
-                            <tr key={customer.CID} className="hover:bg-gray-50 transition-colors">
+                            <tr
+                                key={customer.CID}
+                                onClick={(e) => handleRowClick(customer, e)}
+                                className="hover:bg-blue-50 transition-colors cursor-pointer"
+                            >
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.CID}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{customer.Contract}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{customer.ContractName}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.ContractCompany}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.ContractTel}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.ContractCh}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {customer.ComeFrom || 'ไม่ระบุ'}
+                                    </span>
+                                </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onClick={() => onEdit(customer)} className="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onEdit(customer); }}
+                                        className="text-indigo-600 hover:text-indigo-900 mr-3"
+                                        title="แก้ไข"
+                                    >
                                         <Edit size={18} />
                                     </button>
-                                    <button onClick={() => onDelete(customer.CID)} className="text-red-600 hover:text-red-900">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDelete(customer.CID); }}
+                                        className="text-red-600 hover:text-red-900"
+                                        title="ลบ"
+                                    >
                                         <Trash2 size={18} />
                                     </button>
                                 </td>

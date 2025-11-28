@@ -36,7 +36,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
         const fetchData = async () => {
             const [pidRes, cidRes, teamRes] = await Promise.all([
                 supabase.from('PID').select('PID, PDName, PDPrice'),
-                supabase.from('Customer').select('CID, Contract'),
+                supabase.from('Customer').select('CID, ContractName'),
                 supabase.from('Team').select('EID, NickName, FullName, TeamName')
             ]);
 
@@ -91,7 +91,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
             // Sync CID
             if (formData.CID && customers.length > 0) {
                 const c = customers.find(x => x.CID === formData.CID);
-                if (c) setCidQuery(`${c.CID} - ${c.Contract}`);
+                if (c) setCidQuery(`${c.CID} - ${c.ContractName}`);
             }
             // Sync Staff
             if (formData.Staff && teams.length > 0) {
@@ -142,7 +142,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
 
     const filteredCustomers = customers.filter(c =>
         (c.CID || '').toLowerCase().includes(cidQuery.toLowerCase()) ||
-        (c.Contract || '').toLowerCase().includes(cidQuery.toLowerCase())
+        (c.ContractName || '').toLowerCase().includes(cidQuery.toLowerCase())
     );
 
     const filteredTeams = teams.filter(t =>
@@ -201,13 +201,13 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                                                 key={c.CID}
                                                 onClick={() => {
                                                     setFormData(prev => ({ ...prev, CID: c.CID }));
-                                                    setCidQuery(`${c.CID} - ${c.Contract}`);
+                                                    setCidQuery(`${c.CID} - ${c.ContractName}`);
                                                     setActiveDropdown(null);
                                                 }}
                                                 className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
                                             >
                                                 <div className="font-medium">{c.CID}</div>
-                                                <div className="text-xs text-gray-500">{c.Contract}</div>
+                                                <div className="text-xs text-gray-500">{c.ContractName}</div>
                                             </div>
                                         ))
                                     )}

@@ -94,21 +94,22 @@ export type Customer = {
     Timestamp: string;
     RecBy: string;
     DelDate: string | null;
-    CIDSub: string;
-    Contract: string;
+    CIDSub?: string;
+    ContractName: string; // Changed from Contract
     ContractTel: string;
     ContractCompany: string;
     ContractCh: string;
-    ShipName: string;
-    ShipTel: string;
-    ShipAddress: string;
-    ShipMap: string;
-    TaxName: string;
-    TaxTel: string;
-    TaxNumber: string;
-    TaxAddress: string;
-    TaxShip: string;
-    CIDImportBy: string;
+    // Social Media Contacts
+    LineID?: string;
+    Facebook?: string;
+    Instagram?: string;
+    Other?: string;
+    // Customer Source
+    ComeFrom?: string; // Facebook, LineOA, Google, Walkin, Friend, etc.
+    WelcomeBy?: string;
+    WelcomeDate?: string;
+    ContractPic?: string;
+    CIDImportBy?: string;
 };
 
 export type Team = {
@@ -145,6 +146,16 @@ export type Team = {
 
 // Helper to generate IDs
 export const generateID = {
+    customer: () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        return `C${year}${month}${day}${hours}${minutes}${seconds}`;
+    },
     sale: () => {
         const now = new Date();
         const year = now.getFullYear().toString().slice(-2);
