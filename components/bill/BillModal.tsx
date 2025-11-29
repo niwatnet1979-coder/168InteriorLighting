@@ -118,7 +118,7 @@ export default function BillModal({ isOpen, onClose, onSave, bill }: BillModalPr
                 supabase.from('Customer').select('*').order('TimeStamp', { ascending: false }),
                 supabase.from('Sale').select('*').order('TimeStamp', { ascending: false }),
                 supabase.from('Team').select('EID, NickName, FullName, EndDate').is('EndDate', null),
-                supabase.from('PID').select('PID, PDName, PDDetail')
+                supabase.from('PID').select('PID, PDName, PDType, PDDetail')
             ]);
 
             if (cidRes.data) setCustomers(cidRes.data as Customer[]);
@@ -528,7 +528,13 @@ export default function BillModal({ isOpen, onClose, onSave, bill }: BillModalPr
                                                     <td className="px-4 py-3 text-gray-600">{index + 1}</td>
                                                     <td className="px-4 py-3 font-mono text-gray-900">{item.PID}</td>
                                                     <td className="px-4 py-3 text-gray-700">
-                                                        <div className="font-medium">{products.find(p => p.PID === item.PID)?.PDName || item.PID}</div>
+                                                        <div className="font-medium">
+                                                            {products.find(p => p.PID === item.PID)?.PDType && (
+                                                                <span className="text-blue-600">[{products.find(p => p.PID === item.PID)?.PDType}]</span>
+                                                            )}
+                                                            {' '}
+                                                            {products.find(p => p.PID === item.PID)?.PDName || item.PID}
+                                                        </div>
                                                         <div className="text-xs text-gray-500 mt-1">{products.find(p => p.PID === item.PID)?.PDDetail || '-'}</div>
                                                         <div className="text-xs text-gray-400 mt-1">{item.Dimention || ''} {item.ItemColor} / {item.BulbCollor}</div>
                                                     </td>
