@@ -311,8 +311,8 @@ export default function ProductModal({ isOpen, onClose, onSave, initialData, isS
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700">รายละเอียด</label>
                                 <textarea
-                                    name="PDDetrail"
-                                    value={formData.PDDetrail || ''}
+                                    name="PDDetail"
+                                    value={formData.PDDetail || ''}
                                     onChange={handleChange}
                                     rows={4}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"

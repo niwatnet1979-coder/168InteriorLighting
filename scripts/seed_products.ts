@@ -11,7 +11,7 @@ const products = [
         PDName: 'โคมไฟตั้งโต๊ะสไตล์โมเดิร์น',
         PDType: 'โคมไฟตั้งโต๊ะ',
         PDPrice: 1200,
-        PDDetrail: 'โคมไฟตั้งโต๊ะดีไซน์โมเดิร์น ปรับระดับความสว่างได้ เหมาะสำหรับห้องนอนและห้องทำงาน',
+        PDDetail: 'โคมไฟตั้งโต๊ะดีไซน์โมเดิร์น ปรับระดับความสว่างได้ เหมาะสำหรับห้องนอนและห้องทำงาน',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -21,7 +21,7 @@ const products = [
         PDName: 'โคมไฟแขวนเพดานสไตล์อินดัสเทรียล',
         PDType: 'โคมไฟแขวน',
         PDPrice: 2500,
-        PDDetrail: 'โคมไฟแขวนเพดานสไตล์อินดัสเทรียล โครงเหล็กสีดำ เหมาะกับร้านกาแฟและคาเฟ่',
+        PDDetail: 'โคมไฟแขวนเพดานสไตล์อินดัสเทรียล โครงเหล็กสีดำ เหมาะกับร้านกาแฟและคาเฟ่',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -31,7 +31,7 @@ const products = [
         PDName: 'โคมไฟตั้งพื้นสไตล์มินิมอล',
         PDType: 'โคมไฟตั้งพื้น',
         PDPrice: 3800,
-        PDDetrail: 'โคมไฟตั้งพื้นสูง 150 ซม. ดีไซน์มินิมอล ให้แสงสว่างนุ่มนวล เหมาะสำหรับมุมอ่านหนังสือ',
+        PDDetail: 'โคมไฟตั้งพื้นสูง 150 ซม. ดีไซน์มินิมอล ให้แสงสว่างนุ่มนวล เหมาะสำหรับมุมอ่านหนังสือ',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -41,7 +41,7 @@ const products = [
         PDName: 'โคมไฟผนังแบบติดผนัง LED',
         PDType: 'โคมไฟผนัง',
         PDPrice: 890,
-        PDDetrail: 'โคมไฟ LED ติดผนัง ประหยัดพลังงาน กันน้ำ IP44 เหมาะสำหรับทางเดินและบันได',
+        PDDetail: 'โคมไฟ LED ติดผนัง ประหยัดพลังงาน กันน้ำ IP44 เหมาะสำหรับทางเดินและบันได',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -51,7 +51,7 @@ const products = [
         PDName: 'โคมไฟระย้าคริสตัล 6 แขน',
         PDType: 'โคมระย้า',
         PDPrice: 15800,
-        PDDetrail: 'โคมระย้าคริสตัลหรูหรา 6 แขน ขนาดเส้นผ่านศูนย์กลาง 80 ซม. เหมาะสำหรับห้องรับแขก',
+        PDDetail: 'โคมระย้าคริสตัลหรูหรา 6 แขน ขนาดเส้นผ่านศูนย์กลาง 80 ซม. เหมาะสำหรับห้องรับแขก',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -61,7 +61,7 @@ const products = [
         PDName: 'โคมไฟสปอตไลท์ LED แบบติดราง',
         PDType: 'สปอตไลท์',
         PDPrice: 650,
-        PDDetrail: 'สปอตไลท์ LED 7W ติดรางได้ ปรับมุมได้ 350 องศา เหมาะสำหรับร้านค้าและแกลเลอรี่',
+        PDDetail: 'สปอตไลท์ LED 7W ติดรางได้ ปรับมุมได้ 350 องศา เหมาะสำหรับร้านค้าและแกลเลอรี่',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -71,7 +71,7 @@ const products = [
         PDName: 'โคมไฟนอนสไตล์ญี่ปุ่น',
         PDType: 'โคมไฟตั้งโต๊ะ',
         PDPrice: 1450,
-        PDDetrail: 'โคมไฟตั้งโต๊ะสไตล์ญี่ปุ่น ทำจากกระดาษวาชิ ให้แสงนุ่มนวล สร้างบรรยากาศผ่อนคลาย',
+        PDDetail: 'โคมไฟตั้งโต๊ะสไตล์ญี่ปุ่น ทำจากกระดาษวาชิ ให้แสงนุ่มนวล สร้างบรรยากาศผ่อนคลาย',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -81,7 +81,7 @@ const products = [
         PDName: 'โคมไฟแขวนทรงกลมแก้วใส',
         PDType: 'โคมไฟแขวน',
         PDPrice: 1980,
-        PDDetrail: 'โคมแขวนทรงกลมแก้วใส ขนาด 25 ซม. สายปรับระดับได้ เหมาะกับห้องครัวและบาร์',
+        PDDetail: 'โคมแขวนทรงกลมแก้วใส ขนาด 25 ซม. สายปรับระดับได้ เหมาะกับห้องครัวและบาร์',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -91,7 +91,7 @@ const products = [
         PDName: 'โคมไฟอ่านหนังสือแบบหนีบ LED',
         PDType: 'โคมไฟตั้งโต๊ะ',
         PDPrice: 590,
-        PDDetrail: 'โคมไฟ LED แบบหนีบ ปรับมุมได้ 3 ระดับความสว่าง พกพาสะดวก เหมาะสำหรับนักเรียน',
+        PDDetail: 'โคมไฟ LED แบบหนีบ ปรับมุมได้ 3 ระดับความสว่าง พกพาสะดวก เหมาะสำหรับนักเรียน',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -101,7 +101,7 @@ const products = [
         PDName: 'โคมไฟดาวน์ไลท์ฝังฝ้า LED 9W',
         PDType: 'ดาวน์ไลท์',
         PDPrice: 380,
-        PDDetrail: 'ดาวน์ไลท์ LED 9W แสงขาวนวล ฝังฝ้าได้ รูเจาะ 3 นิ้ว ประหยัดพลังงาน',
+        PDDetail: 'ดาวน์ไลท์ LED 9W แสงขาวนวล ฝังฝ้าได้ รูเจาะ 3 นิ้ว ประหยัดพลังงาน',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -111,7 +111,7 @@ const products = [
         PDName: 'โคมไฟสนามพลังงานแสงอาทิตย์',
         PDType: 'โคมไฟสนาม',
         PDPrice: 1250,
-        PDDetrail: 'โคมไฟสนามโซล่าเซลล์ กันน้ำ IP65 ชาร์จอัตโนมัติกลางวัน ติดไฟกลางคืน',
+        PDDetail: 'โคมไฟสนามโซล่าเซลล์ กันน้ำ IP65 ชาร์จอัตโนมัติกลางวัน ติดไฟกลางคืน',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -121,7 +121,7 @@ const products = [
         PDName: 'โคมไฟระย้าสไตล์วินเทจ 8 แขน',
         PDType: 'โคมระย้า',
         PDPrice: 12500,
-        PDDetrail: 'โคมระย้าสไตล์วินเทจ โครงโลหะสีทองเหลือง 8 แขน เหมาะกับบ้านสไตล์คลาสสิก',
+        PDDetail: 'โคมระย้าสไตล์วินเทจ โครงโลหะสีทองเหลือง 8 แขน เหมาะกับบ้านสไตล์คลาสสิก',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -131,7 +131,7 @@ const products = [
         PDName: 'โคมไฟเพดานกลมสไตล์โมเดิร์น LED',
         PDType: 'โคมไฟเพดาน',
         PDPrice: 2200,
-        PDDetrail: 'โคมไฟเพดานกลม LED 36W ขนาด 50 ซม. ปรับสีแสงได้ 3 โทน พร้อมรีโมท',
+        PDDetail: 'โคมไฟเพดานกลม LED 36W ขนาด 50 ซม. ปรับสีแสงได้ 3 โทน พร้อมรีโมท',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -141,7 +141,7 @@ const products = [
         PDName: 'โคมไฟแขวนไม้ไผ่ทรงตะกร้า',
         PDType: 'โคมไฟแขวน',
         PDPrice: 1680,
-        PDDetrail: 'โคมแขวนทำจากไม้ไผ่สานมือ ทรงตะกร้า ขนาด 40 ซม. สไตล์บาหลี',
+        PDDetail: 'โคมแขวนทำจากไม้ไผ่สานมือ ทรงตะกร้า ขนาด 40 ซม. สไตล์บาหลี',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -151,7 +151,7 @@ const products = [
         PDName: 'โคมไฟผนังแบบ Up-Down สีดำ',
         PDType: 'โคมไฟผนัง',
         PDPrice: 1150,
-        PDDetrail: 'โคมไฟผนังส่องขึ้น-ลง สีดำด้าน กันน้ำ เหมาะสำหรับตกแต่งภายนอกอาคาร',
+        PDDetail: 'โคมไฟผนังส่องขึ้น-ลง สีดำด้าน กันน้ำ เหมาะสำหรับตกแต่งภายนอกอาคาร',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -161,7 +161,7 @@ const products = [
         PDName: 'โคมไฟตั้งโต๊ะไม้สักทรงสูง',
         PDType: 'โคมไฟตั้งโต๊ะ',
         PDPrice: 2850,
-        PDDetrail: 'โคมไฟตั้งโต๊ะฐานไม้สักแท้ ทรงสูง 65 ซม. โคมผ้าลินิน สไตล์คลาสสิก',
+        PDDetail: 'โคมไฟตั้งโต๊ะฐานไม้สักแท้ ทรงสูง 65 ซม. โคมผ้าลินิน สไตล์คลาสสิก',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -171,7 +171,7 @@ const products = [
         PDName: 'โคมไฟแขวนโลหะทรงกรวย',
         PDType: 'โคมไฟแขวน',
         PDPrice: 890,
-        PDDetrail: 'โคมแขวนโลหะทรงกรวย ขนาด 30 ซม. สีดำด้าน เหมาะกับห้องครัวและโต๊ะอาหาร',
+        PDDetail: 'โคมแขวนโลหะทรงกรวย ขนาด 30 ซม. สีดำด้าน เหมาะกับห้องครัวและโต๊ะอาหาร',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -181,7 +181,7 @@ const products = [
         PDName: 'โคมไฟสปอตไลท์ติดเพดาน 3 หัว',
         PDType: 'สปอตไลท์',
         PDPrice: 1580,
-        PDDetrail: 'สปอตไลท์ 3 หัว ปรับทิศทางได้อิสระ LED 21W รวม เหมาะสำหรับห้องนั่งเล่น',
+        PDDetail: 'สปอตไลท์ 3 หัว ปรับทิศทางได้อิสระ LED 21W รวม เหมาะสำหรับห้องนั่งเล่น',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -191,7 +191,7 @@ const products = [
         PDName: 'โคมไฟนอนข้างเตียงแบบสัมผัส',
         PDType: 'โคมไฟตั้งโต๊ะ',
         PDPrice: 950,
-        PDDetrail: 'โคมไฟตั้งโต๊ะแบบสัมผัส ปรับความสว่าง 3 ระดับ พอร์ต USB ชาร์จมือถือ',
+        PDDetail: 'โคมไฟตั้งโต๊ะแบบสัมผัส ปรับความสว่าง 3 ระดับ พอร์ต USB ชาร์จมือถือ',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'
@@ -201,7 +201,7 @@ const products = [
         PDName: 'โคมไฟเพดานสี่เหลี่ยมสไตล์มินิมอล',
         PDType: 'โคมไฟเพดาน',
         PDPrice: 1850,
-        PDDetrail: 'โคมไฟเพดานสี่เหลี่ยม LED 24W ขนาด 40x40 ซม. ดีไซน์มินิมอล สีขาว',
+        PDDetail: 'โคมไฟเพดานสี่เหลี่ยม LED 24W ขนาด 40x40 ซม. ดีไซน์มินิมอล สีขาว',
         PIDSub: '1.0',
         TimeStamp: new Date().toISOString(),
         RecBy: 'Admin'

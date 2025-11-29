@@ -300,7 +300,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                         {formData.PID && (
                             <div className="mt-2 p-2 bg-gray-50 rounded-md border border-gray-200 text-sm text-gray-600">
                                 <span className="font-semibold">รายละเอียด: </span>
-                                {products.find(p => p.PID === formData.PID)?.PDDetrail || '-'}
+                                {products.find(p => p.PID === formData.PID)?.PDDetail || '-'}
                             </div>
                         )}
 

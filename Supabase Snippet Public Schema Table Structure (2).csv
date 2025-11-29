@@ -170,7 +170,7 @@ PID,PID,character varying,NO
 PID,PIDSub,character varying,YES
 PID,PDType,character varying,YES
 PID,PDName,character varying,YES
-PID,PDDetrail,text,YES
+PID,PDDetail,text,YES
 PID,PDPrice,numeric,YES
 PID,PDPic1,text,YES
 PID,PDPic2,text,YES
