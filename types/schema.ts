@@ -80,7 +80,7 @@ export type Product = {
     PIDSub: string;
     PDType: string;
     PDName: string;
-    PDDetail: string;
+    PDDetrail: string; // Note: Schema uses PDDetrail (typo in DB)
     PDPrice: number;
     // Images
     PDPic1: string | null;

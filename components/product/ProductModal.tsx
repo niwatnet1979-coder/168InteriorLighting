@@ -311,8 +311,8 @@ export default function ProductModal({ isOpen, onClose, onSave, initialData, isS
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700">รายละเอียด</label>
                                 <textarea
-                                    name="PDDetail"
-                                    value={formData.PDDetail || ''}
+                                    name="PDDetrail"
+                                    value={formData.PDDetrail || ''}
                                     onChange={handleChange}
                                     rows={4}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"
@@ -353,7 +353,7 @@ export default function ProductModal({ isOpen, onClose, onSave, initialData, isS
                                         {/* Upload Button */}
                                         <input
                                             type="file"
-                                            ref={(el) => { fileInputRefs.current[field] = el; }}
+                                            ref={el => { if (el) fileInputRefs.current[field] = el; }}
                                             onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 if (file) handleImageUpload(field, file);

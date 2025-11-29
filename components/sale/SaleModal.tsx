@@ -296,14 +296,6 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                             )}
                         </div>
 
-                        {/* Product Detail Display */}
-                        {formData.PID && (
-                            <div className="mt-2 p-2 bg-gray-50 rounded-md border border-gray-200 text-sm text-gray-600">
-                                <span className="font-semibold">รายละเอียด: </span>
-                                {products.find(p => p.PID === formData.PID)?.PDDetail || '-'}
-                            </div>
-                        )}
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ราคาต่อหน่วย</label>
@@ -311,7 +303,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                                     key={`price-${formData.PID}`}
                                     type="number"
                                     name="Price"
-                                    value={formData.Price || ''}
+                                    value={formData.Price ?? ''}
                                     onChange={handleChange}
                                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
                                     min="0"
@@ -361,7 +353,7 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                             if (error) throw error;
 
                             // Refresh products list
-                            const { data } = await supabase.from('PID').select('*');
+                            const { data } = await supabase.from('PID').select('PID, PDName, PDPrice');
                             if (data) setProducts(data as Product[]);
 
                             // Auto-select the new product

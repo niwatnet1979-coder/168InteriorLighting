@@ -10,6 +10,7 @@ import { Bill, Team } from '@/types/schema';
 export default function BillPage() {
     const [bills, setBills] = useState<any[]>([]); // Use any for joined data
     const [billItemCounts, setBillItemCounts] = useState<Record<string, number>>({});
+    const [billTotals, setBillTotals] = useState<Record<string, number>>({});
     const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -31,27 +32,25 @@ export default function BillPage() {
                         Customer:CID (
                             ContractName,
                             ContractTel
-                        ),
-                        Sale:SID (
-                            SID,
-                            PID,
-                            SumPrice
                         )
                     `)
                     .order('BID', { ascending: true }),
                 supabase.from('Team').select('EID, NickName'),
-                supabase.from('Sale').select('BID')
+                supabase.from('Sale').select('BID, SumPrice')
             ]);
 
             if (billsRes.error) throw billsRes.error;
             if (teamsRes.error) console.error('Error fetching teams:', teamsRes.error);
 
-            // Count items per bill
+            // Count items and calculate totals per bill
             const counts: Record<string, number> = {};
+            const totals: Record<string, number> = {};
+
             if (salesRes.data) {
                 salesRes.data.forEach((sale: any) => {
                     if (sale.BID) {
                         counts[sale.BID] = (counts[sale.BID] || 0) + 1;
+                        totals[sale.BID] = (totals[sale.BID] || 0) + (Number(sale.SumPrice) || 0);
                     }
                 });
             }
@@ -59,6 +58,7 @@ export default function BillPage() {
             setBills(billsRes.data || []);
             setTeams(teamsRes.data as Team[] || []);
             setBillItemCounts(counts);
+            setBillTotals(totals);
         } catch (error) {
             console.error('Error fetching bills:', error);
         } finally {
@@ -225,7 +225,7 @@ export default function BillPage() {
                                                 </span>
                                             </td>
                                             <td className="p-4 text-right font-bold text-gray-900">
-                                                {item.Sale?.SumPrice ? Number(item.Sale.SumPrice).toLocaleString() : '0'} ฿
+                                                {billTotals[item.BID] ? billTotals[item.BID].toLocaleString() : '0'} ฿
                                             </td>
                                             <td className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-2">
