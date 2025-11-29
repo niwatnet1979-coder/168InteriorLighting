@@ -353,7 +353,7 @@ export default function ProductModal({ isOpen, onClose, onSave, initialData, isS
                                         {/* Upload Button */}
                                         <input
                                             type="file"
-                                            ref={el => fileInputRefs.current[field] = el}
+                                            ref={(el) => { fileInputRefs.current[field] = el; }}
                                             onChange={(e) => {
                                                 const file = e.target.files?.[0];
                                                 if (file) handleImageUpload(field, file);
