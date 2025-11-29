@@ -20,6 +20,7 @@ export default function Home() {
         <header className="mb-10 text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">168APP Admin Dashboard</h1>
           <p className="text-gray-500">ระบบจัดการร้านค้าครบวงจร (Next.js Version)</p>
+          <p className="text-xs text-gray-400 mt-2 font-mono">V0.01_2025-11-29 07:59</p>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
