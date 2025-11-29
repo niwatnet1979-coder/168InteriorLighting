@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: isProd ? '/168go' : '', // ใช้ basePath เฉพาะ production เท่านั้น
+  basePath: isProd ? '/168InteriorLighting' : '', // ใช้ basePath เฉพาะ production เท่านั้น
 };
 
 export default nextConfig;
