@@ -23,7 +23,7 @@ export default function QCModal({ isOpen, onClose, onSave, initialData, isSaving
             } else {
                 setFormData({
                     SN: '',
-                    Timestamp: new Date().toISOString(),
+                    TimeStamp: new Date().toISOString(),
                     RecBy: 'Admin',
                     QCDATE: new Date().toISOString().split('T')[0], // Today YYYY-MM-DD
                     QCPass: 'ผ่าน',

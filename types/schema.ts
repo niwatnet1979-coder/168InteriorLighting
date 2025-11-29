@@ -3,12 +3,18 @@
 
 export type Sale = {
     SID: string; // Primary Key (S + YYMMDDHHMMSS)
-    Timestamp: string;
+    TimeStamp: string;
     RecBy: string;
     DelDate: string | null;
-    Staff: string;
-    CID: string; // Foreign Key -> Customer
+    BID: string | null; // Foreign Key -> Bill
+    // Staff removed - use RecBy or Bill.Seller instead
+    // CID removed - access via Bill.CID instead (Sale -> Bill -> Customer)
     PID: string; // Foreign Key -> Product
+    Dimention: string | null;
+    ItemColor: string | null;
+    BulbCollor: string | null;
+    Remote: string | null;
+    Remark: string | null;
     Action: string;
     Discount: number;
     Price: number;
@@ -31,7 +37,7 @@ export type Sale = {
 
 export type QC = {
     SN: string; // Primary Key
-    Timestamp: string;
+    TimeStamp: string;
     RecBy: string;
     DelDate: string | null;
     QCDATE: string;
@@ -68,7 +74,7 @@ export type QC = {
 
 export type Product = {
     PID: string; // Primary Key
-    Timestamp: string;
+    TimeStamp: string;
     RecBy: string;
     DelDate: string | null;
     PIDSub: string;
@@ -91,10 +97,9 @@ export type Product = {
 
 export type Customer = {
     CID: string; // Primary Key
-    Timestamp: string;
+    TimeStamp: string;
     RecBy: string;
     DelDate: string | null;
-    CIDSub?: string;
     ContractName: string; // Changed from Contract
     ContractTel: string;
     ContractCompany: string;
@@ -113,7 +118,7 @@ export type Customer = {
 };
 
 export type Team = {
-    Timestamp: string;
+    TimeStamp: string;
     RecBy: string;
     DelDate?: string | null;
     EID: string; // Primary Key - Employee ID
@@ -144,6 +149,41 @@ export type Team = {
     EndDate?: string;
 };
 
+export type Bill = {
+    BID: string;           // Primary Key
+    TimeStamp: string;
+    RecBy: string;
+    DelDate: string | null; // วันที่ลบข้อมูล (Soft Delete)
+    BillDate?: string;      // วันที่เปิดบิล (เพิ่มใหม่)
+    CID: string;          // FK -> Customer
+    Seller: string;
+    SID: string | null;   // FK -> Sale (Nullable to allow creating Bill before Sale)
+    Vat: string;
+};
+
+export type CTax = {
+    CTaxID?: string; // Optional because it's auto-generated or handled by DB
+    CID: string;
+    TaxName: string;
+    TaxNumber: string;
+    TaxTel?: string;
+    TaxAddress: string;
+    TaxShip?: string;
+    RecBy?: string;
+    TimeStamp?: string;
+};
+
+export type CShip = {
+    CShipID?: string;
+    CID: string;
+    ShipName: string;
+    ShipTel: string;
+    ShipAddress: string;
+    ShipMap?: string;
+    RecBy?: string;
+    TimeStamp?: string;
+};
+
 // Helper to generate IDs
 export const generateID = {
     customer: () => {
@@ -166,6 +206,16 @@ export const generateID = {
         const seconds = now.getSeconds().toString().padStart(2, '0');
         return `S${year}${month}${day}${hours}${minutes}${seconds}`;
     },
+    bill: () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        return `BD${year}${month}${day}${hours}${minutes}${seconds}`;
+    },
     team: (latestEID?: string) => {
         // Extract number from latest EID (e.g., "EID0011" -> 11)
         let nextNumber = 1;
@@ -177,5 +227,15 @@ export const generateID = {
         }
         // Format as EID0001, EID0002, etc.
         return `EID${nextNumber.toString().padStart(4, '0')}`;
+    },
+    product: () => {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        return `PN${year}${month}${day}${hours}${minutes}${seconds}`;
     }
 };

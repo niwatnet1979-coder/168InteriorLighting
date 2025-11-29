@@ -11,7 +11,7 @@ interface ShippingAddress {
     ShipAddress: string;
     ShipMap?: string;
     RecBy?: string;
-    Timestamp?: string;
+    TimeStamp?: string;
 }
 
 interface ShippingAddressModalProps {

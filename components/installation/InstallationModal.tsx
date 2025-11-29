@@ -94,7 +94,7 @@ export default function InstallationModal({ isOpen, onClose, onSave, initialData
         try {
             const payload = {
                 ...formData,
-                Timestamp: new Date().toISOString(),
+                TimeStamp: new Date().toISOString(),
                 RecBy: 'Admin' // Hardcoded for now
             };
 

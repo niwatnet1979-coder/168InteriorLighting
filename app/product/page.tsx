@@ -36,7 +36,7 @@ export default function ProductPage() {
             const { data, error } = await supabase
                 .from('PID')
                 .select('*')
-                .order('Timestamp', { ascending: false });
+                .order('TimeStamp', { ascending: false });
 
             if (error) throw error;
             setProducts(data || []);
@@ -53,11 +53,11 @@ export default function ProductPage() {
             if (currentProduct) {
                 const { data: latestData } = await supabase
                     .from('PID')
-                    .select('Timestamp')
+                    .select('TimeStamp')
                     .eq('PID', productData.PID)
                     .single();
 
-                if (latestData && new Date(latestData.Timestamp).getTime() > new Date(currentProduct.Timestamp).getTime() + 1000) {
+                if (latestData && new Date(latestData.TimeStamp).getTime() > new Date(currentProduct.TimeStamp).getTime() + 1000) {
                     alert('ข้อมูลถูกแก้ไขโดยผู้ใช้อื่น กรุณาโหลดหน้าใหม่!');
                     fetchProducts();
                     setIsSaving(false);
@@ -65,7 +65,7 @@ export default function ProductPage() {
                 }
             }
 
-            const dataToSave = { ...productData, Timestamp: new Date().toISOString() };
+            const dataToSave = { ...productData, TimeStamp: new Date().toISOString() };
 
             const { error } = currentProduct
                 ? await supabase.from('PID').update(dataToSave).eq('PID', productData.PID)

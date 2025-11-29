@@ -85,11 +85,11 @@ export default function TeamPage() {
             if (currentTeam) {
                 const { data: latestData } = await supabase
                     .from('Team')
-                    .select('Timestamp')
+                    .select('TimeStamp')
                     .eq('EID', teamData.EID)
                     .single();
 
-                if (latestData && new Date(latestData.Timestamp).getTime() > new Date(currentTeam.Timestamp).getTime() + 1000) {
+                if (latestData && new Date(latestData.TimeStamp).getTime() > new Date(currentTeam.TimeStamp).getTime() + 1000) {
                     alert('ข้อมูลถูกแก้ไขโดยผู้ใช้อื่น กรุณาโหลดหน้าใหม่!');
                     fetchTeams();
                     setIsSaving(false);
@@ -97,7 +97,7 @@ export default function TeamPage() {
                 }
             }
 
-            const dataToSave = { ...teamData, Timestamp: new Date().toISOString() };
+            const dataToSave = { ...teamData, TimeStamp: new Date().toISOString() };
 
             const { error } = currentTeam
                 ? await supabase.from('Team').update(dataToSave).eq('EID', teamData.EID)
@@ -128,12 +128,19 @@ export default function TeamPage() {
         }
     };
 
-    const filteredTeams = teams.filter(t =>
-        (t.EID && t.EID.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (t.NickName && t.NickName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (t.FullName && t.FullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (t.TeamName && t.TeamName.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const [activeTab, setActiveTab] = useState<'active' | 'resigned'>('active');
+
+    const filteredTeams = teams.filter(t => {
+        const matchesSearch = (t.EID && t.EID.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (t.NickName && t.NickName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (t.FullName && t.FullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (t.TeamName && t.TeamName.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        const isResigned = !!t.EndDate;
+        const matchesTab = activeTab === 'active' ? !isResigned : isResigned;
+
+        return matchesSearch && matchesTab;
+    });
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
@@ -151,6 +158,28 @@ export default function TeamPage() {
                     >
                         <Plus size={20} className="mr-2" />
                         เพิ่มทีมงานใหม่
+                    </button>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex space-x-1 rounded-xl bg-gray-200 p-1 mb-6 w-fit">
+                    <button
+                        onClick={() => setActiveTab('active')}
+                        className={`w-40 rounded-lg py-2.5 text-sm font-medium leading-5 ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 ${activeTab === 'active'
+                                ? 'bg-white text-blue-700 shadow'
+                                : 'text-gray-600 hover:bg-white/[0.12] hover:text-gray-800'
+                            }`}
+                    >
+                        พนักงานปัจจุบัน
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('resigned')}
+                        className={`w-40 rounded-lg py-2.5 text-sm font-medium leading-5 ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 ${activeTab === 'resigned'
+                                ? 'bg-white text-red-700 shadow'
+                                : 'text-gray-600 hover:bg-white/[0.12] hover:text-gray-800'
+                            }`}
+                    >
+                        พนักงานที่ลาออก
                     </button>
                 </div>
 

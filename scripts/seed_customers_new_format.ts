@@ -60,7 +60,7 @@ async function seedRealisticCustomers() {
 
             const customer = {
                 CID: cid,
-                Timestamp: new Date().toISOString(),
+                TimeStamp: new Date().toISOString(),
                 RecBy: 'Admin',
                 DelDate: null,
                 ContractName: `${firstName} ${lastName}`,
@@ -89,7 +89,7 @@ async function seedRealisticCustomers() {
                 ShipAddress: generateAddress(),
                 ShipMap: j % 5 === 0 ? `https://maps.google.com/?q=${Math.random()}` : null,
                 RecBy: 'Admin',
-                Timestamp: new Date().toISOString()
+                TimeStamp: new Date().toISOString()
             });
         }
 
@@ -104,7 +104,7 @@ async function seedRealisticCustomers() {
                     ShipAddress: generateAddress(),
                     ShipMap: j === 0 ? `https://maps.google.com/?q=${Math.random()}` : null,
                     RecBy: 'Admin',
-                    Timestamp: new Date().toISOString()
+                    TimeStamp: new Date().toISOString()
                 });
             }
         }
@@ -128,7 +128,7 @@ async function seedRealisticCustomers() {
                 TaxAddress: generateAddress(),
                 TaxShip: j % 2 === 0 ? generateAddress() : null,
                 RecBy: 'Admin',
-                Timestamp: new Date().toISOString()
+                TimeStamp: new Date().toISOString()
             });
         }
 
@@ -145,7 +145,7 @@ async function seedRealisticCustomers() {
                     TaxAddress: generateAddress(),
                     TaxShip: j === 0 ? null : generateAddress(),
                     RecBy: 'Admin',
-                    Timestamp: new Date().toISOString()
+                    TimeStamp: new Date().toISOString()
                 });
             }
         }

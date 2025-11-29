@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase, subscribeToTable } from '@/lib/supabase';
-import { Sale } from '@/types/schema';
+import { Sale, Team } from '@/types/schema';
 import SaleTable from '@/components/sale/SaleTable';
 import SaleModal from '@/components/sale/SaleModal';
 import { Plus, Search, ArrowLeft } from 'lucide-react';
@@ -10,6 +10,7 @@ import Link from 'next/link';
 
 export default function SalePage() {
     const [sales, setSales] = useState<Sale[]>([]);
+    const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,9 +26,6 @@ export default function SalePage() {
             console.log('Realtime Update:', payload);
             // Refresh data when any change happens
             fetchSales();
-
-            // Optional: Show toast notification
-            // toast.info('ข้อมูลมีการเปลี่ยนแปลง');
         });
 
         return () => {
@@ -37,13 +35,16 @@ export default function SalePage() {
 
     const fetchSales = async () => {
         try {
-            const { data, error } = await supabase
-                .from('Sale')
-                .select('*')
-                .order('Timestamp', { ascending: false });
+            const [salesRes, teamsRes] = await Promise.all([
+                supabase.from('Sale').select('*').order('TimeStamp', { ascending: false }),
+                supabase.from('Team').select('EID, NickName')
+            ]);
 
-            if (error) throw error;
-            setSales(data || []);
+            if (salesRes.error) throw salesRes.error;
+            if (teamsRes.error) console.error('Error fetching teams:', teamsRes.error);
+
+            setSales(salesRes.data || []);
+            setTeams(teamsRes.data as Team[] || []);
         } catch (error) {
             console.error('Error fetching sales:', error);
         } finally {
@@ -59,12 +60,12 @@ export default function SalePage() {
             if (currentSale) {
                 const { data: latestData } = await supabase
                     .from('Sale')
-                    .select('Timestamp')
+                    .select('TimeStamp')
                     .eq('SID', saleData.SID)
                     .single();
 
-                // Compare Timestamps (Allow 1s difference)
-                if (latestData && new Date(latestData.Timestamp).getTime() > new Date(currentSale.Timestamp).getTime() + 1000) {
+                // Compare TimeStamps (Allow 1s difference)
+                if (latestData && new Date(latestData.TimeStamp).getTime() > new Date(currentSale.TimeStamp).getTime() + 1000) {
                     alert('ข้อมูลถูกแก้ไขโดยผู้ใช้อื่นกรุณาโหลดหน้าใหม่!');
                     fetchSales(); // Refresh to get latest data
                     setIsSaving(false);
@@ -72,8 +73,11 @@ export default function SalePage() {
                 }
             }
 
-            // Update Timestamp
-            const dataToSave = { ...saleData, Timestamp: new Date().toISOString() };
+            // Update TimeStamp
+            // Remove Staff from dataToSave because it doesn't exist in DB
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { ...rest } = saleData;
+            const dataToSave = { ...rest, TimeStamp: new Date().toISOString() };
 
             const { error } = currentSale
                 ? await supabase.from('Sale').update(dataToSave).eq('SID', saleData.SID)
@@ -105,8 +109,7 @@ export default function SalePage() {
     // Filter Logic
     const filteredSales = sales.filter(s =>
         s.SID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.CID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.Staff?.toLowerCase().includes(searchTerm.toLowerCase())
+        s.RecBy?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -147,6 +150,7 @@ export default function SalePage() {
                 ) : (
                     <SaleTable
                         sales={filteredSales}
+                        teams={teams}
                         onEdit={(sale) => { setCurrentSale(sale); setIsModalOpen(true); }}
                         onDelete={handleDelete}
                     />

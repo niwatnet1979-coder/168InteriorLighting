@@ -1,0 +1,331 @@
+table_name,column_name,data_type,is_nullable
+Bill,BID,text,NO
+Bill,TimeStamp,timestamp without time zone,YES
+Bill,RecBy,text,YES
+Bill,DelDate,text,YES
+Bill,CID,text,YES
+Bill,Seller,text,YES
+Bill,Vat,text,YES
+Bill,SID,text,YES
+Bill,BillDate,text,YES
+Buy,TimeStamp,timestamp without time zone,YES
+Buy,RecBy,character varying,YES
+Buy,DelDate,date,YES
+Buy,BID,character varying,NO
+Buy,BIDType,character varying,YES
+Buy,Event,character varying,YES
+Buy,Staff,character varying,YES
+Buy,OrderDueDate,date,YES
+Buy,PID,character varying,YES
+Buy,PIDSub,character varying,YES
+Buy,ShopID,character varying,YES
+Buy,Detail,text,YES
+Buy,ShopUrl,text,YES
+Buy,Qty,integer,YES
+Buy,Currency,character varying,YES
+Buy,Rate,numeric,YES
+Buy,ShopPrice,numeric,YES
+Buy,ShopShip,numeric,YES
+Buy,ShopSumPriceTH,numeric,YES
+Buy,ShopPayDate,date,YES
+Buy,ShopPaySlip,text,YES
+Buy,ShopPayBy,character varying,YES
+Buy,ShopPaySlip_2,text,YES
+Buy,ShopLabel,character varying,YES
+Buy,ShopShiptoYDCNDate,date,YES
+Buy,YDLabel,character varying,YES
+Buy,YDShipPrice,numeric,YES
+Buy,YDShipto168Date,date,YES
+Buy,ReimburseDate,date,YES
+Buy,ReimburseSlip,text,YES
+Buy,InvoiceSlip,text,YES
+Buy,RecieptSlip,text,YES
+Buy,RecordBy,character varying,YES
+Buy,จำนวน,integer,YES
+Buy,วันที่เช็คสินค้า,date,YES
+Buy,สินค้าอยู่ที่,character varying,YES
+Buy,เลขที่สินค้า,character varying,YES
+Buy,เลขพัสดุจีน,character varying,YES
+Buy,เลขที่ใบส่งของ YD,character varying,YES
+CShip,CShipID,uuid,NO
+CShip,TimeStamp,timestamp without time zone,YES
+CShip,RecBy,text,YES
+CShip,DelDate,text,YES
+CShip,CID,text,YES
+CShip,ShipName,text,YES
+CShip,ShipTel,text,YES
+CShip,ShipAddress,text,YES
+CShip,ShipMap,text,YES
+CTax,CTaxID,uuid,NO
+CTax,TimeStamp,timestamp without time zone,YES
+CTax,RecBy,text,YES
+CTax,DelDate,text,YES
+CTax,CID,text,YES
+CTax,TaxName,text,YES
+CTax,TaxNumber,text,YES
+CTax,TaxTel,text,YES
+CTax,TaxAddress,text,YES
+CTax,TaxShip,text,YES
+CheckStock,TimeStamp,timestamp without time zone,YES
+CheckStock,CheckName,character varying,YES
+CheckStock,SN,character varying,YES
+CheckStock,LastCheck,date,YES
+CheckStock,ShipID,character varying,YES
+CheckStock,PicLabel1,text,YES
+CheckStock,PicLabel2,text,YES
+CheckStock,Pic1,text,YES
+CheckStock,Pic2,text,YES
+Commission,TimeStamp,timestamp without time zone,YES
+Commission,Start Date,date,YES
+Commission,End Date,date,YES
+Commission,Staff,character varying,YES
+Commission,รวมยอดขาย,numeric,YES
+Commission,รวมยอดขายที่ชำระครบ,numeric,YES
+Commission,รวมยอดที่ชำระครบและติ,numeric,YES
+Commission,อัตตราคอมมิชชั่น,numeric,YES
+Commission,รวมค่าคอมมิชชั่น,numeric,YES
+Commission,AllSale&InstallComplete,character varying,YES
+Commission,QCDefect,character varying,YES
+Commission,QCBonus%,numeric,YES
+Commission,StaffNum,character varying,YES
+Commission,Working%,numeric,YES
+Commission,QCBonusSum,numeric,YES
+Commission,SumAll,numeric,YES
+Commission,PayDate,date,YES
+Commission,Slip,text,YES
+CommissionExt,TimeStamp,timestamp without time zone,YES
+CommissionExt,RecBy,character varying,YES
+CommissionExt,DelDate,date,YES
+CommissionExt,CommissionID,character varying,NO
+CommissionExt,เลขที่งานขาย,character varying,YES
+CommissionExt,ยอดขายตามบิล,numeric,YES
+CommissionExt,CommiExpPrice,numeric,YES
+CommissionExt,คำนวนเป็น%,numeric,YES
+CommissionExt,หักณที่จ่าย%,numeric,YES
+CommissionExt,SUM,numeric,YES
+CommissionExt,ชื่อผู้ขายภายนอก,character varying,YES
+CommissionExt,เบอร์โทร,character varying,YES
+CommissionExt,Email,character varying,YES
+CommissionExt,ชำระวันที่,date,YES
+CommissionExt,Invoice,text,YES
+CommissionExt,Slip,text,YES
+Customer,CID,text,NO
+Customer,TimeStamp,timestamp without time zone,YES
+Customer,RecBy,text,YES
+Customer,DelDate,text,YES
+Customer,ContractName,text,YES
+Customer,ContractTel,text,YES
+Customer,ContractCompany,text,YES
+Customer,ContractCh,text,YES
+Customer,WelcomeBy,text,YES
+Customer,WelcomeDate,text,YES
+Customer,ContractPic,text,YES
+Customer,LineID,text,YES
+Customer,Facebook,text,YES
+Customer,Instagram,text,YES
+Customer,Other,text,YES
+Customer,ComeFrom,text,YES
+Data_set,NO,character varying,YES
+Data_set,สินค้าอยู่ที่,character varying,YES
+Data_set,ช่าง,character varying,YES
+Data_set,ประเภทโคมไฟ,character varying,YES
+Data_set,สี:ฐาน โครงสร้าง,character varying,YES
+Data_set,สี:คริสตัล โคม,character varying,YES
+Data_set,สถานะงานติดตั้ง,character varying,YES
+Data_set,หลอดไฟ,character varying,YES
+Data_set,แสงไฟ,character varying,YES
+Installation_Ship,IID,text,NO
+Installation_Ship,TimeStamp,timestamp without time zone,YES
+Installation_Ship,RecBy,text,YES
+Installation_Ship,DelDate,text,YES
+Installation_Ship,SID,text,YES
+Installation_Ship,InstallationTeam,text,YES
+Installation_Ship,Status,text,YES
+Installation_Ship,PlanDate,text,YES
+Installation_Ship,CompleteDate,text,YES
+Installation_Ship,ShipTravelPrice,text,YES
+Installation_Ship,InstallationPrice,text,YES
+Installation_Ship,InstallationPayDate,text,YES
+Installation_Ship,InstallationPaySlip,text,YES
+Installation_Ship,Remark,text,YES
+Installation_Ship,Score,text,YES
+Installation_Ship,Sign,text,YES
+Installation_Ship,Pic01,text,YES
+Installation_Ship,Pic02,text,YES
+Installation_Ship,Pic03,text,YES
+Installation_Ship,Pic04,text,YES
+Installation_Ship,Pic05,text,YES
+Installation_Ship,Pic06,text,YES
+Installation_Ship,Pic07,text,YES
+Installation_Ship,Pic08,text,YES
+Installation_Ship,Pic09,text,YES
+Installation_Ship,Pic10,text,YES
+Installation_Ship,QCDefect,text,YES
+PDG,PDG,character varying,NO
+PDG,PDGName,character varying,YES
+PID,TimeStamp,timestamp without time zone,YES
+PID,RecBy,character varying,YES
+PID,DelDate,date,YES
+PID,PID,character varying,NO
+PID,PIDSub,character varying,YES
+PID,PDType,character varying,YES
+PID,PDName,character varying,YES
+PID,PDDetrail,text,YES
+PID,PDPrice,numeric,YES
+PID,PDPic1,text,YES
+PID,PDPic2,text,YES
+PID,PDPic3,text,YES
+PID,PDPic4,text,YES
+PID,PDPic5,text,YES
+PID,PDPic6,text,YES
+PID,PDPic7,text,YES
+PID,PDPic8,text,YES
+PID,PDPic9,text,YES
+PID,PDPic10,text,YES
+QC,TimeStamp,timestamp without time zone,YES
+QC,RecBy,character varying,YES
+QC,DelDate,date,YES
+QC,SN,character varying,YES
+QC,QCDATE,date,YES
+QC,Staff,character varying,YES
+QC,ShopLabel,character varying,YES
+QC,QCPass,character varying,YES
+QC,YDLabel,character varying,YES
+QC,ProductType,character varying,YES
+QC,BodyColor,character varying,YES
+QC,BulbType,character varying,YES
+QC,BulbColor,character varying,YES
+QC,Dimention,character varying,YES
+QC,QCRemark,text,YES
+QC,QCQty,integer,YES
+QC,PicLabel1,text,YES
+QC,PicLabel2,text,YES
+QC,PicManual1,text,YES
+QC,PicManual2,text,YES
+QC,PicQC1,text,YES
+QC,PicQC2,text,YES
+QC,PicQC3,text,YES
+QC,PicQC4,text,YES
+QC,PicQC5,text,YES
+QC,PicQC6,text,YES
+QC,PicQC7,text,YES
+QC,PicQC8,text,YES
+QC,PicQC9,text,YES
+QC,PicQC10,text,YES
+QC,PicDriver,text,YES
+QC,PicRemote,text,YES
+QC,ShipID,character varying,YES
+Report,TimeStamp,timestamp without time zone,YES
+Report,Start Date,date,YES
+Report,End Date,date,YES
+Report,ต้นทุนสินค้า,numeric,YES
+Report,รวมค่านำเข้า+ค่าส่ง+ติ,numeric,YES
+Report,ทุนติดตั้ง,numeric,YES
+Report,รวมต้นทุนทั้งหมด,numeric,YES
+Report,ราคาขาย,numeric,YES
+Report,มัดจำ,numeric,YES
+Report,มัดจำ2,numeric,YES
+Report,ยอดค้าง,numeric,YES
+Report,magin,numeric,YES
+Report,ยอดค้างสะสม,numeric,YES
+Report,กำไรสะสม,numeric,YES
+Report,BankBalance,numeric,YES
+Report,BankSlip,text,YES
+Report,BankSlip2,text,YES
+Report,รายจ่ายอื่นๆรวม,numeric,YES
+Report,เงินเดือนผู้บริหาร,numeric,YES
+Report,โฆษณา ส่งเสริมการขาย,numeric,YES
+Report,ภาษี บัญชี,numeric,YES
+Report,รถ เดินทาง,numeric,YES
+Report,อาคาร สาธารณูปโภค,numeric,YES
+Report,อาหาร,numeric,YES
+Report,ตกแต่งร้านรื้อถอนไม่ใ,numeric,YES
+Report,อะไหล่โคมไฟ,numeric,YES
+Report,อุปกรณ์ไม่สึกหรอ,numeric,YES
+Report,อุปกรณ์สิ้นเปลือง,numeric,YES
+Report,อื่นๆ,numeric,YES
+Sale,SID,text,NO
+Sale,TimeStamp,timestamp without time zone,YES
+Sale,RecBy,text,YES
+Sale,DelDate,text,YES
+Sale,BID,text,YES
+Sale,PID,text,YES
+Sale,Dimention,text,YES
+Sale,ItemColor,text,YES
+Sale,BulbCollor,text,YES
+Sale,Remote,text,YES
+Sale,Remark,text,YES
+Sale,Action,text,YES
+Sale,Discount,text,YES
+Sale,Price,text,YES
+Sale,Qty,text,YES
+Sale,ShipPrice,text,YES
+Sale,InstallationPrice,text,YES
+Sale,SumPrice,text,YES
+Sale,Pay1Date,text,YES
+Sale,Pay1Price,text,YES
+Sale,Pay1Ch,text,YES
+Sale,TAX1ShipDate,text,YES
+Sale,Pay2Date,text,YES
+Sale,Pay2Price,text,YES
+Sale,Pay2Ch,text,YES
+Sale,TAX2ShipDate,text,YES
+Sale,CommissionID,text,YES
+Sale,Profit,text,YES
+ShippingBox,TimeStamp,timestamp without time zone,YES
+ShippingBox,ShippingBox,character varying,YES
+ShippingBox,SN,character varying,YES
+ShippingBox,ShippingPlan,character varying,YES
+ShippingBox,Long,numeric,YES
+ShippingBox,Wide,numeric,YES
+ShippingBox,High,numeric,YES
+ShippingBox,Weigh,numeric,YES
+ShippingPlan,TimeStamp,timestamp without time zone,YES
+ShippingPlan,RecBy,character varying,YES
+ShippingPlan,DelDate,date,YES
+ShippingPlan,ShippingID,character varying,NO
+ShippingPlan,ShipingOp,character varying,YES
+ShippingPlan,ShipingDate,date,YES
+ShippingPlan,ShippingForm,character varying,YES
+ShippingPlan,ShippingTo,character varying,YES
+ShippingPlan,ShippingDetail,text,YES
+ShippingPlan,ShippingCost,numeric,YES
+ShippingPlan,ShippingPayBy,character varying,YES
+ShippingPlan,CreatBy,character varying,YES
+ShippingPlan,ShippingBy,character varying,YES
+ShippingPlan,ShippingActual,numeric,YES
+ShippingPlan,SNPlan,character varying,YES
+ShippingPlan,SNCount,integer,YES
+ShippingPlan,ShippingSlip1,text,YES
+ShippingPlan,ShippingSlip2,text,YES
+ShippingPlan,Pic1,text,YES
+ShippingPlan,Pic2,text,YES
+Team,TimeStamp,timestamp without time zone,YES
+Team,RecBy,text,YES
+Team,DelDate,text,YES
+Team,EID,text,NO
+Team,TeamName,text,YES
+Team,TeamType,text,YES
+Team,UserType,text,YES
+Team,Email,text,YES
+Team,NickName,text,YES
+Team,FullName,text,YES
+Team,LastName,text,YES
+Team,CitizenID,text,YES
+Team,Bank,text,YES
+Team,ACNumber,text,YES
+Team,BirthDay,text,YES
+Team,StartDate,text,YES
+Team,Address,text,YES
+Team,Tel1,text,YES
+Team,Tel2,text,YES
+Team,Job,text,YES
+Team,Level,text,YES
+Team,WorkType,text,YES
+Team,PayType,text,YES
+Team,PayRate,text,YES
+Team,IncentiveRate,text,YES
+Team,Pic,text,YES
+Team,CitizenIDPic,text,YES
+Team,HouseRegPic,text,YES
+Team,EndDate,text,YES

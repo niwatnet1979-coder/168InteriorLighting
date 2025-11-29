@@ -48,7 +48,7 @@ const generateData = async () => {
         const lname = random(lastNames);
         customers.push({
             CID: `C${pad(i)}`,
-            Timestamp: new Date().toISOString(),
+            TimeStamp: new Date().toISOString(),
             RecBy: 'Admin',
             DelDate: randomDate(),
             ContractName: `${fname} ${lname}`,
@@ -69,7 +69,7 @@ const generateData = async () => {
     for (let i = 1; i <= 20; i++) {
         bills.push({
             BID: `B${pad(i)}`,
-            Timestamp: new Date().toISOString(),
+            TimeStamp: new Date().toISOString(),
             RecBy: 'Sale01',
             DelDate: randomDate(),
             CID: `C${pad(i)}`, // 1:1 mapping for simplicity
@@ -88,7 +88,7 @@ const generateData = async () => {
         const qty = Math.floor(Math.random() * 5) + 1;
         sales.push({
             SID: `S${pad(i)}`,
-            Timestamp: new Date().toISOString(),
+            TimeStamp: new Date().toISOString(),
             RecBy: 'Sale01',
             DelDate: randomDate(),
             BID: `B${pad(i)}`, // 1:1 mapping
@@ -121,7 +121,7 @@ const generateData = async () => {
     for (let i = 1; i <= 20; i++) {
         const cust = customers[i - 1];
         cships.push({
-            Timestamp: new Date().toISOString(),
+            TimeStamp: new Date().toISOString(),
             RecBy: 'Admin',
             DelDate: randomDate(),
             CID: cust.CID,
@@ -140,7 +140,7 @@ const generateData = async () => {
     for (let i = 1; i <= 20; i++) {
         const cust = customers[i - 1];
         ctaxes.push({
-            Timestamp: new Date().toISOString(),
+            TimeStamp: new Date().toISOString(),
             RecBy: 'Admin',
             DelDate: randomDate(),
             CID: cust.CID,
@@ -160,7 +160,7 @@ const generateData = async () => {
     for (let i = 1; i <= 20; i++) {
         installs.push({
             IID: `I${pad(i)}`,
-            Timestamp: new Date().toISOString(),
+            TimeStamp: new Date().toISOString(),
             RecBy: 'Admin',
             DelDate: randomDate(),
             SID: `S${pad(i)}`, // 1:1 mapping

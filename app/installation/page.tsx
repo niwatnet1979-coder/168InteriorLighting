@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 interface Installation {
     IID: string;
-    Timestamp: string;
+    TimeStamp: string;
     InstallationTeam: string;
     Status: string;
     PlanDate: string;

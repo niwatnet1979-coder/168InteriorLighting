@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Sale, generateID, Product, Customer, Team } from '@/types/schema';
+import { Sale, generateID, Product, Team } from '@/types/schema';
 import { supabase } from '@/lib/supabase';
-import { X, Search, ChevronDown } from 'lucide-react';
+import { X, Search, ChevronDown, Plus } from 'lucide-react';
+import ProductModal from '../product/ProductModal';
 
 interface SaleModalProps {
     isOpen: boolean;
@@ -18,35 +19,39 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
 
     // Data Lists
     const [products, setProducts] = useState<Product[]>([]);
-    const [customers, setCustomers] = useState<Customer[]>([]);
     const [teams, setTeams] = useState<Team[]>([]);
 
     // Search States
     const [pidQuery, setPidQuery] = useState('');
-    const [cidQuery, setCidQuery] = useState('');
     const [staffQuery, setStaffQuery] = useState('');
 
     // Dropdown Open States
-    const [activeDropdown, setActiveDropdown] = useState<'pid' | 'cid' | 'staff' | null>(null);
+    const [activeDropdown, setActiveDropdown] = useState<'pid' | 'staff' | null>(null);
+
+    // Product Modal State
+    const [showProductModal, setShowProductModal] = useState(false);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const pidInputRef = useRef<HTMLInputElement>(null);
+    const staffInputRef = useRef<HTMLInputElement>(null);
 
     // Fetch Data (Products, Customers, Teams)
     useEffect(() => {
         const fetchData = async () => {
-            const [pidRes, cidRes, teamRes] = await Promise.all([
-                supabase.from('PID').select('PID, PDName, PDPrice'),
-                supabase.from('Customer').select('CID, ContractName'),
-                supabase.from('Team').select('EID, NickName, FullName, TeamName')
+            const [productsRes, teamsRes] = await Promise.all([
+                supabase.from('PID').select('*'),
+                supabase.from('Team').select('EID, NickName, FullName, EndDate').is('EndDate', null)
             ]);
 
-            if (pidRes.error) console.error('Error fetching PID:', pidRes.error);
-            if (cidRes.error) console.error('Error fetching Customer:', cidRes.error);
-            if (teamRes.error) console.error('Error fetching Team:', teamRes.error);
+            if (productsRes.error) console.error('Error fetching Product:', productsRes.error);
+            if (teamsRes.error) console.error('Error fetching Team:', teamsRes.error);
 
-            if (pidRes.data) setProducts(pidRes.data as Product[]);
-            if (cidRes.data) setCustomers(cidRes.data as Customer[]);
-            if (teamRes.data) setTeams(teamRes.data as Team[]);
+            if (productsRes.data) {
+                console.log('Fetched products:', productsRes.data);
+                console.log('First product PDPrice:', productsRes.data[0]?.PDPrice);
+                setProducts(productsRes.data as Product[]);
+            }
+            if (teamsRes.data) setTeams(teamsRes.data as Team[]);
         };
 
         if (isOpen) fetchData();
@@ -58,12 +63,11 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
             if (initialData) {
                 setFormData(initialData);
                 setPidQuery(initialData.PID || '');
-                setCidQuery(initialData.CID || '');
-                setStaffQuery(initialData.Staff || '');
+                setStaffQuery(initialData.RecBy || '');
             } else {
                 setFormData({
                     SID: generateID.sale(),
-                    Timestamp: new Date().toISOString(),
+                    TimeStamp: new Date().toISOString(),
                     RecBy: 'Admin',
                     Price: 0,
                     Qty: 1,
@@ -73,7 +77,6 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                     SumPrice: 0
                 });
                 setPidQuery('');
-                setCidQuery('');
                 setStaffQuery('');
             }
             setActiveDropdown(null);
@@ -88,18 +91,13 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                 const p = products.find(x => x.PID === formData.PID);
                 if (p) setPidQuery(`${p.PID} - ${p.PDName}`);
             }
-            // Sync CID
-            if (formData.CID && customers.length > 0) {
-                const c = customers.find(x => x.CID === formData.CID);
-                if (c) setCidQuery(`${c.CID} - ${c.ContractName}`);
-            }
-            // Sync Staff
-            if (formData.Staff && teams.length > 0) {
-                const t = teams.find(x => x.EID === formData.Staff);
+            // Sync Staff (RecBy)
+            if (formData.RecBy && teams.length > 0) {
+                const t = teams.find(x => x.EID === formData.RecBy);
                 if (t) setStaffQuery(`${t.EID} - ${t.NickName}`);
             }
         }
-    }, [formData.PID, formData.CID, formData.Staff, products, customers, teams, activeDropdown]);
+    }, [formData.PID, formData.RecBy, products, teams, activeDropdown]);
 
     // Calculate Total Price
     useEffect(() => {
@@ -126,7 +124,15 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+
+        // Convert to number for numeric fields
+        const numberFields = ['Price', 'Qty', 'Discount', 'ShipPrice', 'InstallationPrice'];
+        if (numberFields.includes(name)) {
+            const numValue = value === '' ? 0 : parseFloat(value) || 0;
+            setFormData(prev => ({ ...prev, [name]: numValue }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -138,11 +144,6 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
     const filteredProducts = products.filter(p =>
         (p.PID || '').toLowerCase().includes(pidQuery.toLowerCase()) ||
         (p.PDName || '').toLowerCase().includes(pidQuery.toLowerCase())
-    );
-
-    const filteredCustomers = customers.filter(c =>
-        (c.CID || '').toLowerCase().includes(cidQuery.toLowerCase()) ||
-        (c.ContractName || '').toLowerCase().includes(cidQuery.toLowerCase())
     );
 
     const filteredTeams = teams.filter(t =>
@@ -175,55 +176,20 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                             <input type="text" name="SID" value={formData.SID || ''} readOnly className="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm p-2" />
                         </div>
 
-                        {/* CID Dropdown */}
-                        <div className="relative">
-                            <label className="block text-sm font-medium text-gray-700">ลูกค้า (CID / ชื่อ)</label>
-                            <div className="relative mt-1">
-                                <input
-                                    type="text"
-                                    value={cidQuery}
-                                    onChange={(e) => { setCidQuery(e.target.value); setActiveDropdown('cid'); }}
-                                    onFocus={() => setActiveDropdown('cid')}
-                                    placeholder="ค้นหาลูกค้า..."
-                                    className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500"
-                                />
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                    {activeDropdown === 'cid' ? <Search size={18} /> : <ChevronDown size={18} />}
-                                </div>
-                            </div>
-                            {activeDropdown === 'cid' && (
-                                <div className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                    {filteredCustomers.length === 0 ? (
-                                        <div className="py-2 px-4 text-gray-700">ไม่พบลูกค้า</div>
-                                    ) : (
-                                        filteredCustomers.map((c) => (
-                                            <div
-                                                key={c.CID}
-                                                onClick={() => {
-                                                    setFormData(prev => ({ ...prev, CID: c.CID }));
-                                                    setCidQuery(`${c.CID} - ${c.ContractName}`);
-                                                    setActiveDropdown(null);
-                                                }}
-                                                className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
-                                            >
-                                                <div className="font-medium">{c.CID}</div>
-                                                <div className="text-xs text-gray-500">{c.ContractName}</div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
                         {/* Staff Dropdown */}
+                        {/* Staff Dropdown (Mapped to RecBy) */}
                         <div className="relative">
                             <label className="block text-sm font-medium text-gray-700">พนักงานขาย (EID / ชื่อเล่น)</label>
                             <div className="relative mt-1">
                                 <input
+                                    ref={staffInputRef}
                                     type="text"
                                     value={staffQuery}
                                     onChange={(e) => { setStaffQuery(e.target.value); setActiveDropdown('staff'); }}
-                                    onFocus={() => setActiveDropdown('staff')}
+                                    onFocus={() => {
+                                        setStaffQuery(''); // Clear to show all options
+                                        setActiveDropdown('staff');
+                                    }}
                                     placeholder="ค้นหาพนักงาน..."
                                     className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500"
                                 />
@@ -240,9 +206,10 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                                             <div
                                                 key={t.EID}
                                                 onClick={() => {
-                                                    setFormData(prev => ({ ...prev, Staff: t.EID }));
+                                                    setFormData(prev => ({ ...prev, RecBy: t.EID }));
                                                     setStaffQuery(`${t.EID} - ${t.NickName}`);
                                                     setActiveDropdown(null);
+                                                    staffInputRef.current?.blur(); // Close dropdown by removing focus
                                                 }}
                                                 className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
                                             >
@@ -263,18 +230,33 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                         {/* PID Dropdown */}
                         <div className="relative">
                             <label className="block text-sm font-medium text-gray-700">ค้นหาสินค้า (PID / ชื่อ)</label>
-                            <div className="relative mt-1">
-                                <input
-                                    type="text"
-                                    value={pidQuery}
-                                    onChange={(e) => { setPidQuery(e.target.value); setActiveDropdown('pid'); }}
-                                    onFocus={() => setActiveDropdown('pid')}
-                                    placeholder="ค้นหาสินค้า..."
-                                    className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500"
-                                />
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
-                                    {activeDropdown === 'pid' ? <Search size={18} /> : <ChevronDown size={18} />}
+                            <div className="flex gap-2 mt-1">
+                                <div className="relative flex-1">
+                                    <input
+                                        ref={pidInputRef}
+                                        type="text"
+                                        value={pidQuery}
+                                        onChange={(e) => { setPidQuery(e.target.value); setActiveDropdown('pid'); }}
+                                        onFocus={() => {
+                                            setPidQuery(''); // Clear to show all options
+                                            setActiveDropdown('pid');
+                                        }}
+                                        placeholder="ค้นหาสินค้า..."
+                                        className="block w-full rounded-md border border-gray-300 shadow-sm p-2 pr-10 focus:ring-2 focus:ring-blue-500"
+                                        title="ค้นหาสินค้า"
+                                    />
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                        {activeDropdown === 'pid' ? <Search size={18} /> : <ChevronDown size={18} />}
+                                    </div>
                                 </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowProductModal(true)}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-2 whitespace-nowrap"
+                                    title="เพิ่มสินค้าใหม่"
+                                >
+                                    <Plus size={18} /> เพิ่มสินค้า
+                                </button>
                             </div>
                             {activeDropdown === 'pid' && (
                                 <div className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
@@ -285,9 +267,20 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                                             <div
                                                 key={p.PID}
                                                 onClick={() => {
-                                                    setFormData(prev => ({ ...prev, PID: p.PID, Price: p.PDPrice }));
+                                                    console.log('=== Product Selection ===');
+                                                    console.log('Selected product:', p);
+                                                    console.log('PDPrice:', p.PDPrice);
+                                                    const price = p.PDPrice || 0;
+                                                    console.log('Calculated price:', price);
+                                                    setFormData(prev => {
+                                                        console.log('Previous formData:', prev);
+                                                        const newData = { ...prev, PID: p.PID, Price: price };
+                                                        console.log('New formData:', newData);
+                                                        return newData;
+                                                    });
                                                     setPidQuery(`${p.PID} - ${p.PDName}`);
                                                     setActiveDropdown(null);
+                                                    pidInputRef.current?.blur(); // Close dropdown by removing focus
                                                 }}
                                                 className="cursor-pointer py-2 pl-3 pr-9 hover:bg-blue-50 text-gray-900 border-b border-gray-50"
                                             >
@@ -303,10 +296,26 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                             )}
                         </div>
 
+                        {/* Product Detail Display */}
+                        {formData.PID && (
+                            <div className="mt-2 p-2 bg-gray-50 rounded-md border border-gray-200 text-sm text-gray-600">
+                                <span className="font-semibold">รายละเอียด: </span>
+                                {products.find(p => p.PID === formData.PID)?.PDDetrail || '-'}
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ราคาต่อหน่วย</label>
-                                <input type="number" name="Price" value={formData.Price || 0} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" />
+                                <input
+                                    key={`price-${formData.PID}`}
+                                    type="number"
+                                    name="Price"
+                                    value={formData.Price || ''}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
+                                    min="0"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">จำนวน</label>
@@ -316,13 +325,13 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ส่วนลด</label>
-                                <input type="number" name="Discount" value={formData.Discount || 0} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 text-red-600" />
+                                <input type="number" name="Discount" value={formData.Discount ?? ''} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 text-red-600" min="0" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">ค่าส่ง + ติดตั้ง</label>
                                 <div className="flex gap-2">
-                                    <input type="number" name="ShipPrice" placeholder="ส่ง" value={formData.ShipPrice || 0} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" />
-                                    <input type="number" name="InstallationPrice" placeholder="ติดตั้ง" value={formData.InstallationPrice || 0} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" />
+                                    <input type="number" name="ShipPrice" placeholder="ส่ง" value={formData.ShipPrice ?? ''} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" min="0" />
+                                    <input type="number" name="InstallationPrice" placeholder="ติดตั้ง" value={formData.InstallationPrice ?? ''} onChange={handleChange} className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2" min="0" />
                                 </div>
                             </div>
                         </div>
@@ -340,6 +349,33 @@ export default function SaleModal({ isOpen, onClose, onSave, initialData, isSavi
                     </div>
                 </form>
             </div>
+
+            {/* Product Modal */}
+            {showProductModal && (
+                <ProductModal
+                    isOpen={showProductModal}
+                    onClose={() => setShowProductModal(false)}
+                    onSave={async (productData) => {
+                        try {
+                            const { error } = await supabase.from('PID').insert([productData]);
+                            if (error) throw error;
+
+                            // Refresh products list
+                            const { data } = await supabase.from('PID').select('*');
+                            if (data) setProducts(data as Product[]);
+
+                            // Auto-select the new product
+                            setFormData(prev => ({ ...prev, PID: productData.PID }));
+                            setPidQuery(`${productData.PID} - ${productData.PDName}`);
+                            setShowProductModal(false);
+                        } catch (error: any) {
+                            alert('Error saving product: ' + error.message);
+                        }
+                    }}
+                    initialData={null}
+                    isSaving={false}
+                />
+            )}
         </div>
     );
 }

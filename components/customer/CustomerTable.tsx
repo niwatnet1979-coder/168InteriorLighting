@@ -3,8 +3,12 @@
 import { Customer } from '@/types/schema';
 import { Edit, Trash2 } from 'lucide-react';
 
+interface CustomerWithLatestBill extends Customer {
+    LatestBillDate?: string | null;
+}
+
 interface CustomerTableProps {
-    customers: Customer[];
+    customers: CustomerWithLatestBill[];
     onEdit: (customer: Customer) => void;
     onDelete: (cid: string) => void;
 }
@@ -19,6 +23,17 @@ export default function CustomerTable({ customers, onEdit, onDelete }: CustomerT
         onEdit(customer);
     };
 
+    const formatDate = (dateString?: string | null) => {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('th-TH', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
     return (
         <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
             <table className="min-w-full divide-y divide-gray-200">
@@ -29,13 +44,14 @@ export default function CustomerTable({ customers, onEdit, onDelete }: CustomerT
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">บริษัท</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เบอร์โทร</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ช่องทาง</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ทำรายการซื้อล่าสุด</th>
                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                     {customers.length === 0 ? (
                         <tr>
-                            <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                            <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
                                 ไม่พบข้อมูลลูกค้า
                             </td>
                         </tr>
@@ -54,6 +70,9 @@ export default function CustomerTable({ customers, onEdit, onDelete }: CustomerT
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                         {customer.ComeFrom || 'ไม่ระบุ'}
                                     </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {formatDate(customer.LatestBillDate)}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button

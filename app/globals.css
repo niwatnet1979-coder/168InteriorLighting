@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Make all form inputs more visible with darker text */
+input,
+select,
+textarea {
+  color: #111827; /* text-gray-900 */
+  font-weight: 500;
+}
+
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+  color: #9ca3af; /* text-gray-400 */
+  font-weight: 400;
+}
+
+/* Ensure readonly fields are still visible */
+input:read-only {
+  color: #374151; /* text-gray-700 */
+}
+

@@ -38,7 +38,7 @@ export default function TeamModal({
             } else {
                 setFormData({
                     EID: generateID.team(latestEID),
-                    Timestamp: new Date().toISOString(),
+                    TimeStamp: new Date().toISOString(),
                     RecBy: 'Admin',
                     TeamType: '',
                     UserType: 'user'

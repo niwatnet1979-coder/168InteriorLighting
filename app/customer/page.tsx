@@ -27,13 +27,34 @@ export default function CustomerPage() {
 
     const fetchCustomers = async () => {
         try {
-            const { data, error } = await supabase
+            // Fetch Customers
+            const { data: customersData, error: customersError } = await supabase
                 .from('Customer')
                 .select('*')
-                .order('Timestamp', { ascending: false });
+                .order('TimeStamp', { ascending: false });
 
-            if (error) throw error;
-            setCustomers(data || []);
+            if (customersError) throw customersError;
+
+            // Fetch Latest Bills for each customer
+            // Note: In a larger app, we might want to use a view or RPC for performance
+            const { data: billsData, error: billsError } = await supabase
+                .from('Bill')
+                .select('CID, TimeStamp')
+                .order('TimeStamp', { ascending: false });
+
+            if (billsError) throw billsError;
+
+            // Map latest bill date to customer
+            const customersWithBill = (customersData || []).map(customer => {
+                const customerBills = billsData?.filter(b => b.CID === customer.CID) || [];
+                const latestBill = customerBills.length > 0 ? customerBills[0] : null; // Already ordered by TimeStamp desc
+                return {
+                    ...customer,
+                    LatestBillDate: latestBill ? latestBill.TimeStamp : null
+                };
+            });
+
+            setCustomers(customersWithBill);
         } catch (error) {
             console.error('Error fetching customers:', error);
         } finally {
@@ -47,11 +68,11 @@ export default function CustomerPage() {
             if (currentCustomer) {
                 const { data: latestData } = await supabase
                     .from('Customer')
-                    .select('Timestamp')
+                    .select('TimeStamp')
                     .eq('CID', customerData.CID)
                     .single();
 
-                if (latestData && new Date(latestData.Timestamp).getTime() > new Date(currentCustomer.Timestamp).getTime() + 1000) {
+                if (latestData && new Date(latestData.TimeStamp).getTime() > new Date(currentCustomer.TimeStamp).getTime() + 1000) {
                     alert('ข้อมูลถูกแก้ไขโดยผู้ใช้อื่น กรุณาโหลดหน้าใหม่!');
                     fetchCustomers();
                     setIsSaving(false);
@@ -59,7 +80,7 @@ export default function CustomerPage() {
                 }
             }
 
-            const dataToSave = { ...customerData, Timestamp: new Date().toISOString() };
+            const dataToSave = { ...customerData, TimeStamp: new Date().toISOString() };
 
             const { error } = currentCustomer
                 ? await supabase.from('Customer').update(dataToSave).eq('CID', customerData.CID)

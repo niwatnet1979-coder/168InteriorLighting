@@ -82,7 +82,7 @@ async function seed() {
             ContractTel: generateThaiPhoneNumber(),
             ContractCompany: `${company} จำกัด`,
             RecBy: 'Admin',
-            Timestamp: new Date().toISOString()
+            TimeStamp: new Date().toISOString()
         });
     }
 
@@ -113,7 +113,7 @@ async function seed() {
                 ShipAddress: `${Math.floor(Math.random() * 900) + 1} ซอย ${Math.floor(Math.random() * 50) + 1} ถนนสุขุมวิท แขวง${district} เขต${district} กรุงเทพฯ 10${Math.floor(Math.random() * 50) + 10}`,
                 ShipMap: `https://maps.google.com/?q=13.${Math.floor(Math.random() * 5000) + 7000},100.${Math.floor(Math.random() * 5000) + 5000}`,
                 RecBy: 'Admin',
-                Timestamp: new Date().toISOString()
+                TimeStamp: new Date().toISOString()
             });
         }
     }
@@ -145,7 +145,7 @@ async function seed() {
                 TaxAddress: `${Math.floor(Math.random() * 900) + 1} อาคาร${customer.ContractCompany.split(' ')[0]} ชั้น ${Math.floor(Math.random() * 30) + 1} ถนนสีลม แขวง${district} เขต${district} กรุงเทพฯ 10500`,
                 TaxShip: `ใช้ที่อยู่เดียวกับบริษัท`,
                 RecBy: 'Admin',
-                Timestamp: new Date().toISOString()
+                TimeStamp: new Date().toISOString()
             });
         }
     }

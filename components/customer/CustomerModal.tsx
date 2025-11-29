@@ -17,12 +17,13 @@ interface CustomerModalProps {
 
 export default function CustomerModal({ isOpen, onClose, onSave, initialData, isSaving }: CustomerModalProps) {
     const [formData, setFormData] = useState<Partial<Customer>>({});
-    const [activeTab, setActiveTab] = useState<'contact' | 'shipping' | 'tax'>('contact');
+    const [activeTab, setActiveTab] = useState<'contact' | 'shipping' | 'tax' | 'bills'>('contact');
     const [isEditMode, setIsEditMode] = useState(false); // New: Edit mode state
 
     // Related Data State
     const [shippingAddresses, setShippingAddresses] = useState<any[]>([]);
     const [taxInfos, setTaxInfos] = useState<any[]>([]);
+    const [customerBills, setCustomerBills] = useState<any[]>([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
 
     // Sub-Modal State
@@ -41,9 +42,8 @@ export default function CustomerModal({ isOpen, onClose, onSave, initialData, is
             } else {
                 setFormData({
                     CID: generateID.customer(), // Auto-generate CID
-                    Timestamp: new Date().toISOString(),
-                    RecBy: 'Admin',
-                    CIDSub: '1.0'
+                    TimeStamp: new Date().toISOString(),
+                    RecBy: 'Admin'
                 });
                 setShippingAddresses([]);
                 setTaxInfos([]);
@@ -69,6 +69,24 @@ export default function CustomerModal({ isOpen, onClose, onSave, initialData, is
                 .select('*')
                 .eq('CID', cid);
             setTaxInfos(taxes || []);
+
+            // Fetch Bills (Latest 100)
+            const { data: bills } = await supabase
+                .from('Bill')
+                .select(`
+                    BID,
+                    BillDate,
+                    TimeStamp,
+                    Seller,
+                    Vat,
+                    Sale:SID (
+                        SumPrice
+                    )
+                `)
+                .eq('CID', cid)
+                .order('TimeStamp', { ascending: false })
+                .limit(100);
+            setCustomerBills(bills || []);
         } catch (error) {
             console.error('Error fetching related data:', error);
         } finally {
@@ -80,7 +98,7 @@ export default function CustomerModal({ isOpen, onClose, onSave, initialData, is
     const handleSaveShipping = async (data: any) => {
         setIsSavingRelated(true);
         try {
-            const dataToSave = { ...data, RecBy: 'Admin', Timestamp: new Date().toISOString() };
+            const dataToSave = { ...data, RecBy: 'Admin', TimeStamp: new Date().toISOString() };
 
             if (currentShipping) {
                 // Update
@@ -122,7 +140,7 @@ export default function CustomerModal({ isOpen, onClose, onSave, initialData, is
     const handleSaveTax = async (data: any) => {
         setIsSavingRelated(true);
         try {
-            const dataToSave = { ...data, RecBy: 'Admin', Timestamp: new Date().toISOString() };
+            const dataToSave = { ...data, RecBy: 'Admin', TimeStamp: new Date().toISOString() };
 
             if (currentTax) {
                 // Update
@@ -224,6 +242,9 @@ export default function CustomerModal({ isOpen, onClose, onSave, initialData, is
                     </button>
                     <button onClick={() => setActiveTab('tax')} className={`py-3 px-4 flex items-center gap-2 border-b-2 font-medium transition-colors ${activeTab === 'tax' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
                         <FileText size={18} /> ข้อมูลใบกำกับภาษี ({taxInfos.length})
+                    </button>
+                    <button onClick={() => setActiveTab('bills')} className={`py-3 px-4 flex items-center gap-2 border-b-2 font-medium transition-colors ${activeTab === 'bills' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+                        <FileText size={18} /> ประวัติบิล ({customerBills.length})
                     </button>
                 </div>
 
@@ -448,6 +469,56 @@ export default function CustomerModal({ isOpen, onClose, onSave, initialData, is
                                             </div>
                                         </div>
                                     ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {activeTab === 'bills' && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-sm font-medium text-gray-700">ประวัติบิลล่าสุด 100 รายการ</h3>
+                            </div>
+                            {loadingRelated ? (
+                                <div className="text-center text-gray-500 py-4">กำลังโหลดข้อมูล...</div>
+                            ) : customerBills.length === 0 ? (
+                                <div className="text-center text-gray-500 py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                                    ยังไม่มีประวัติการสั่งซื้อ
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">เลขที่บิล</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">พนักงานขาย</th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VAT</th>
+                                                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">ยอดรวม</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {customerBills.map((bill) => (
+                                                <tr key={bill.BID} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                        {bill.BillDate || new Date(bill.TimeStamp).toLocaleDateString('th-TH')}
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-teal-600">
+                                                        {bill.BID}
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                                                        {bill.Seller || '-'}
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                                        {bill.Vat}%
+                                                    </td>
+                                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">
+                                                        {bill.Sale?.SumPrice ? Number(bill.Sale.SumPrice).toLocaleString() : '0'} ฿
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             )}
                         </div>

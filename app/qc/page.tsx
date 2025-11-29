@@ -35,7 +35,7 @@ export default function QCPage() {
             const { data, error } = await supabase
                 .from('QC')
                 .select('*')
-                .order('Timestamp', { ascending: false });
+                .order('TimeStamp', { ascending: false });
 
             if (error) throw error;
             setQCList(data || []);
@@ -53,11 +53,11 @@ export default function QCPage() {
             if (currentQC) {
                 const { data: latestData } = await supabase
                     .from('QC')
-                    .select('Timestamp')
+                    .select('TimeStamp')
                     .eq('SN', qcData.SN)
                     .single();
 
-                if (latestData && new Date(latestData.Timestamp).getTime() > new Date(currentQC.Timestamp).getTime() + 1000) {
+                if (latestData && new Date(latestData.TimeStamp).getTime() > new Date(currentQC.TimeStamp).getTime() + 1000) {
                     alert('ข้อมูลถูกแก้ไขโดยผู้ใช้อื่น กรุณาโหลดหน้าใหม่!');
                     fetchQC();
                     setIsSaving(false);
@@ -65,7 +65,7 @@ export default function QCPage() {
                 }
             }
 
-            const dataToSave = { ...qcData, Timestamp: new Date().toISOString() };
+            const dataToSave = { ...qcData, TimeStamp: new Date().toISOString() };
 
             const { error } = currentQC
                 ? await supabase.from('QC').update(dataToSave).eq('SN', qcData.SN)

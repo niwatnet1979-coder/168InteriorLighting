@@ -76,7 +76,7 @@ async function seed() {
             ContractTel: `08${i.toString().padStart(8, '0')}`,
             ContractCompany: `Company ${i} Co., Ltd.`,
             RecBy: 'Admin',
-            Timestamp: new Date().toISOString()
+            TimeStamp: new Date().toISOString()
         });
     }
 
@@ -106,7 +106,7 @@ async function seed() {
                 ShipAddress: `Address ${j} for ${customer.CID}, Some District, Some Province`,
                 ShipMap: `https://maps.google.com/?q=13.7${j},100.5${j}`,
                 RecBy: 'Admin',
-                Timestamp: new Date().toISOString()
+                TimeStamp: new Date().toISOString()
             });
         }
     }
@@ -138,7 +138,7 @@ async function seed() {
                 TaxAddress: `Tax Address ${j} for ${customer.CID}`,
                 TaxShip: `Invoice Address ${j} for ${customer.CID}`,
                 RecBy: 'Admin',
-                Timestamp: new Date().toISOString()
+                TimeStamp: new Date().toISOString()
             });
         }
     }
