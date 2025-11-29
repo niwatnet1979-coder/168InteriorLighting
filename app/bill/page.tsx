@@ -9,6 +9,7 @@ import { Bill, Team } from '@/types/schema';
 
 export default function BillPage() {
     const [bills, setBills] = useState<any[]>([]); // Use any for joined data
+    const [billItemCounts, setBillItemCounts] = useState<Record<string, number>>({});
     const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -22,7 +23,7 @@ export default function BillPage() {
     const fetchBills = async () => {
         setLoading(true);
         try {
-            const [billsRes, teamsRes] = await Promise.all([
+            const [billsRes, teamsRes, salesRes] = await Promise.all([
                 supabase
                     .from('Bill')
                     .select(`
@@ -38,14 +39,26 @@ export default function BillPage() {
                         )
                     `)
                     .order('BID', { ascending: true }),
-                supabase.from('Team').select('EID, NickName')
+                supabase.from('Team').select('EID, NickName'),
+                supabase.from('Sale').select('BID')
             ]);
 
             if (billsRes.error) throw billsRes.error;
             if (teamsRes.error) console.error('Error fetching teams:', teamsRes.error);
 
+            // Count items per bill
+            const counts: Record<string, number> = {};
+            if (salesRes.data) {
+                salesRes.data.forEach((sale: any) => {
+                    if (sale.BID) {
+                        counts[sale.BID] = (counts[sale.BID] || 0) + 1;
+                    }
+                });
+            }
+
             setBills(billsRes.data || []);
             setTeams(teamsRes.data as Team[] || []);
+            setBillItemCounts(counts);
         } catch (error) {
             console.error('Error fetching bills:', error);
         } finally {
@@ -160,6 +173,7 @@ export default function BillPage() {
                                     <th className="p-4">BID</th>
                                     <th className="p-4">ลูกค้า</th>
                                     <th className="p-4">วันที่เปิดบิล</th>
+                                    <th className="p-4">จำนวนรายการ</th>
                                     <th className="p-4">พนักงานขาย</th>
                                     <th className="p-4">VAT</th>
                                     <th className="p-4 text-right">ยอดรวม (บาท)</th>
@@ -169,11 +183,11 @@ export default function BillPage() {
                             <tbody className="divide-y divide-gray-100">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={7} className="p-8 text-center text-gray-500">กำลังโหลดข้อมูล...</td>
+                                        <td colSpan={8} className="p-8 text-center text-gray-500">กำลังโหลดข้อมูล...</td>
                                     </tr>
                                 ) : filteredBills.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="p-8 text-center text-gray-500">ไม่พบข้อมูล</td>
+                                        <td colSpan={8} className="p-8 text-center text-gray-500">ไม่พบข้อมูล</td>
                                     </tr>
                                 ) : (
                                     filteredBills.map((item) => (
@@ -193,6 +207,11 @@ export default function BillPage() {
                                                     <Calendar size={16} />
                                                     <span>{item.BillDate || '-'}</span>
                                                 </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                                                    {billItemCounts[item.BID] || 0} รายการ
+                                                </span>
                                             </td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
