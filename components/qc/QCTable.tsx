@@ -1,7 +1,10 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { QC } from '@/types/schema';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Printer } from 'lucide-react';
+import { useReactToPrint } from 'react-to-print';
+import { QCPrintLabel } from './QCPrintLabel';
 
 interface QCTableProps {
     qcList: QC[];
@@ -10,8 +13,26 @@ interface QCTableProps {
 }
 
 export default function QCTable({ qcList, onEdit, onDelete }: QCTableProps) {
+    const [printQC, setPrintQC] = useState<QC | null>(null);
+    const printRef = useRef<HTMLDivElement>(null);
+
+    const handlePrint = useReactToPrint({
+        contentRef: printRef,
+        onAfterPrint: () => setPrintQC(null),
+    });
+
+    useEffect(() => {
+        if (printQC) {
+            handlePrint();
+        }
+    }, [printQC, handlePrint]);
+
     return (
         <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
+            <div style={{ display: 'none' }}>
+                {printQC && <QCPrintLabel ref={printRef} data={printQC} />}
+            </div>
+
             <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                     <tr>
@@ -48,6 +69,13 @@ export default function QCTable({ qcList, onEdit, onDelete }: QCTableProps) {
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button
+                                        onClick={() => setPrintQC(qc)}
+                                        className="text-gray-600 hover:text-gray-900 mr-3"
+                                        title="Print QR Label"
+                                    >
+                                        <Printer size={18} />
+                                    </button>
                                     <button onClick={() => onEdit(qc)} className="text-indigo-600 hover:text-indigo-900 mr-3">
                                         <Edit size={18} />
                                     </button>
